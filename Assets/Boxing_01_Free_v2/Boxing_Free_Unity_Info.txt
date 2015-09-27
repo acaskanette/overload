@@ -1,0 +1,31 @@
+Boxing_Free
+A Subset of “Boxing 01”
+
+Check out the video here:
+http://youtu.be/Flko50MXoEU
+
+A free set of 8 boxing animations.  Includes an idle, right cross and left jab, getting hit by the right cross and left jab, a block, knockout, knockout countdown, and victory celebration.
+
+All idles and transitions have been carefully pose-matched, for seamless motion trees.
+All animations are .fbx format, standard fbx bone names.
+
+UNITY 3D NOTES:
+
+“MotusMan_v2” can be used as the main Avatar, and all files are currently set to “Generic”.
+
+Of course, all parameters can be altered and set up to implement the animations as you wish. If the Rig is set to “Humanoid”, all “Muscle” assignments should automatically be correct, except for “Chest”. “MotusMan_v2” has three spine bones, and the third, “Spine2”, is likely the better choice versus the auto-choice “Spine1”.
+
+Please refer to the Unity documentation or contact us with any other questions.
+mocap@motusdigital.com
+
+Animation List
+Box1_M3_Block_
+Box1_M3_Hit_By_Jab_V1
+Box1_M3_Idle
+Box1_M3_Knockout_Countdown_V1
+Box1_M3_Knockout_V1
+Box1_M3_Left_Jab
+Box1_M3_Right_Cross
+Box1_M3_Win_V1
+
+Provided Motus Man character is copyright © Motus Digital, LLC
