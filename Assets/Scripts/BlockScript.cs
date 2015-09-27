@@ -2,21 +2,22 @@
 using System.Collections;
 
 
-public class ColorTrigger : MonoBehaviour {
+public class BlockScript : MonoBehaviour {
        
 
-    public bool isActive;
-    private bool isTouched;
-    private Color colour;
+    private bool isActive;       // When the block is lit up
+    private bool isTouched;     // When the block has been stepped on and changed texture
+    private Color colour;       // Glow colour, what set the block belongs to
 
     public Color defaultColour;
-    public Texture touchedTexture;
-    public Texture defaultTexture;
+    public Texture touchedTexture;  // What block changes to when touch
+    public Texture defaultTexture;  // No texture applied after block deactivated
 
     // Getter for IsActive
     public bool IsActive()
     {
         return isActive;
+        
     }
 
     // Getter for IsTouched
@@ -64,11 +65,11 @@ public class ColorTrigger : MonoBehaviour {
     void OnTriggerEnter(Collider other)     // OnTouched
     {
         print("OnTriggerEnter");
-        if (isActive && !isTouched && other.tag == "Player") {
+        if (isActive && !isTouched && other.tag == "Player") {  // If this tile's active and it hasn't been touched yet and the player entered
             // other.GetComponent<ConstructFloor>().TouchedTile(gameObject);              
             isTouched = true;            
             GetComponent<Renderer>().material.SetTexture("_MKGlowTex", touchedTexture);
-            other.GetComponent<ConstructFloor>().CheckDoneAndDeactivate(colour);
+            other.GetComponent<FloorScript>().CheckDoneAndDeactivate(colour);
             GetComponent<AudioSource>().Play();
         }
 
@@ -80,6 +81,8 @@ public class ColorTrigger : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+        
+
+
 	}
 }

@@ -3,30 +3,20 @@ using System.Collections;
 using System;
 
 
-//struct FloorTile {
+public class FloorScript : MonoBehaviour {
 
-//    public GameObject tile;         // The GameObject that stores the Tile itself
-//    public bool isActive;           // Whether or not this Tile is lit up
-//    public bool isTouched;          // Whether or not this Tile is "on", when all of a colour are on it kills all enemies of that colour
-//    public Color color;             // Color of the tile currently
-
-//}
-
-
-public class ConstructFloor : MonoBehaviour {
-
-    public GameObject floortile;
-  
+    public GameObject floortile;  
 
     public int sizeOfGrid = 9; // should be odd
     public int sizeOfTile = 1;
 
-    public const int BLOCKS_PER_COLOUR = 3;
+    public const int TILES_PER_SET = 3;
 
     private System.Random rand;
+
     private Color[] colours = { Color.red, Color.yellow, Color.cyan, Color.magenta };
    
-    private GameObject[,] floor;
+    private GameObject[,] floor;    // 2D array of floortiles
     
 
 
@@ -39,7 +29,7 @@ public class ConstructFloor : MonoBehaviour {
 
         BuildFloor();                       // Builds the main floor of the level
         BuildWalls();                       // Builds walls around the level            
-        ActivateBlockSet();                 // Activate one block set
+        ActivateTileSet(rand.Next(0,colours.Length));                 // Activate one block set
 
     }
 
@@ -51,16 +41,15 @@ public class ConstructFloor : MonoBehaviour {
     {
         // Instantiate floor struct
         floor = new GameObject[sizeOfGrid, sizeOfGrid];
-        int startPoint = -(sizeOfGrid / 2);
+
+        int startPoint = -(sizeOfGrid / 2); // upper left bound of the grid
+        
         for (int i = 0; i < sizeOfGrid; i++)
         {
             for (int j = 0; j < sizeOfGrid; j++)
             {
 
-                floor[i, j] = (GameObject)(GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0, (startPoint + j) * sizeOfTile), Quaternion.identity));
-                //// floor[i,j].tile.isActive = false;
-                //floor[i, j].isTouched = false;
-                //floor[i, j].color = defaultColour;
+                floor[i, j] = (GameObject)(GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0, (startPoint + j) * sizeOfTile), Quaternion.identity));                
 
             }
         }
@@ -69,13 +58,14 @@ public class ConstructFloor : MonoBehaviour {
     void BuildWalls()
     {
 
-        int startPoint = -(sizeOfGrid / 2 + 1);
+        int startPoint = -(sizeOfGrid / 2 + 1);     // diagonal from outer corner of floor
 
         // Make walls
         for (int i = 0; i < sizeOfGrid + 2; i++)
         {
             GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0.5f, sizeOfGrid + 1), Quaternion.identity);
             GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0.5f, -(sizeOfGrid + 1)), Quaternion.identity);
+            
             if (i != 0 || i != (sizeOfGrid + 1))
             {
                 GameObject.Instantiate(floortile, new Vector3(-(sizeOfGrid + 1), 0.5f, (startPoint + i) * sizeOfTile), Quaternion.identity);
@@ -86,16 +76,16 @@ public class ConstructFloor : MonoBehaviour {
     }
 
 
-    void ActivateBlockSet()
+    void ActivateTileSet(int randomColour)
     {
 
         GameObject activeTile;                                  // FloorTile to light up
 
-        int randomColour = rand.Next(0, colours.Length);       // Colour to assign, update later when enemies are finished
+        //int randomColour = rand.Next(0, colours.Length);       // Colour to assign, update later when enemies are finished
 
 
         // For as many blocks as there are in a set....
-        for (int b = 0; b < BLOCKS_PER_COLOUR; b++)
+        for (int b = 0; b < TILES_PER_SET; b++)
         {
 
             if (!AllActive())  // As long as there is an active block out there
@@ -121,7 +111,7 @@ public class ConstructFloor : MonoBehaviour {
         x = rand.Next(0, sizeOfGrid);
         y = rand.Next(0, sizeOfGrid);
 
-        ColorTrigger tileScript = floor[x, y].GetComponent<ColorTrigger>();
+        BlockScript tileScript = floor[x, y].GetComponent<BlockScript>();
         
         if ( tileScript.IsActive() )       // If it's Active
             return GetInactiveTile();      // Get a new one                   
@@ -142,7 +132,7 @@ public class ConstructFloor : MonoBehaviour {
         {
             for (int j = 0; j < sizeOfGrid; j++)
             {
-                ColorTrigger tileScript = floor[i,j].GetComponent<ColorTrigger>();
+                BlockScript tileScript = floor[i, j].GetComponent<BlockScript>();
                 allActive = allActive && tileScript.IsActive();
             }
         }
@@ -156,42 +146,14 @@ public class ConstructFloor : MonoBehaviour {
     /// <param name="_floorTile">Which tile to activate.</param>    
     /// <param name="_color">Colour the tile will glow.</param>
     private void ActivateTile(GameObject _floorTile, Color _colour) {
-        print("activate-construct00");
-        ColorTrigger tileScript = _floorTile.GetComponent<ColorTrigger>();
+        print("ActivateTile");
+        BlockScript tileScript = _floorTile.GetComponent<BlockScript>();
         tileScript.ActivateTile(_colour);
                        
     }
 
 
-
-    /// <summary>
-    /// Touches a tile.
-    /// </summary>
-    /// <param name="tileTouched"></param>
-    //public void TouchedTile(GameObject tileTouched) {
-
-    //    for (int i = 0; i < sizeOfGrid; i++) {
-    //        for (int j = 0; j < sizeOfGrid; j++) {
-    //            //Debug.Log("" + i + j + " " + floor[i,j].isActive);
-    //            if (tileTouched == floor[i,j].tile) {
-
-    //                // Debug.Log("Tile: " + i + " " + j + " ..." + floor[i, j].isActive);
-
-    //                ColorTrigger tileScript = floor[i, j].tile.GetComponent<ColorTrigger>();
-    //                if (floor[i,j].tile.GetComponent<ColorTrigger>().isActive && !floor[i,j].isTouched)
-    //                {                        
-    //                    floor[i,j].tile.GetComponent<AudioSource>().Play();
-    //                    floor[i,j].tile.GetComponent<Renderer>().material.SetTexture("_MKGlowTex", pressedTexture);
-    //                    floor[i,j].isTouched = true;
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //}
-
-    
-        
+      
     /// <summary>
     /// Resets a tile to default.
     /// </summary>
@@ -199,39 +161,41 @@ public class ConstructFloor : MonoBehaviour {
     /// <param name="_color"></param>
     private void DeActivateTile(GameObject _floorTile)
     {
-
-        _floorTile.GetComponent<ColorTrigger>().DeactivateTile(); 
-        //= false;
-        //_floorTile.isTouched = false;
-        //_floorTile.color = defaultColour;
-        //_floorTile.tile.GetComponent<Renderer>().material.SetColor("_MKGlowColor", defaultColour);
-
+        _floorTile.GetComponent<BlockScript>().DeactivateTile();         
     }
 
+
+    /// <summary>
+    /// Check if that set has all been touched, and if so deactivate them.
+    /// </summary>
+    /// <param name="_colour">Set I am checking</param>
     public void CheckDoneAndDeactivate(Color _colour)
     {
-        bool allDone = true;
-        GameObject[] tColours = new GameObject[BLOCKS_PER_COLOUR];
+        bool allTouched = true;
+        GameObject[] tTilesOfColourSet = new GameObject[TILES_PER_SET];
+        
         int tColoursIndex = 0;
+        
         for (int i = 0; i < sizeOfGrid; i++)
         {
             for (int j = 0; j < sizeOfGrid; j++)
             {
-                ColorTrigger tileScript = floor[i, j].GetComponent<ColorTrigger>();
-                if (tileScript.GetColour() == _colour)
+                BlockScript tileScript = floor[i, j].GetComponent<BlockScript>();
+                if (tileScript.GetColour() == _colour)      // If the tile is the colour I'm checking
                 {
-                    allDone = allDone && tileScript.IsTouched();
-                    tColours[tColoursIndex] = floor[i, j];
+                    allTouched = allTouched && tileScript.IsTouched();    // Then see if it's all touched
+                    tTilesOfColourSet[tColoursIndex] = floor[i, j];
                     tColoursIndex++;
                 }
             }
         }
 
-        if (allDone)
+        if (allTouched)
         {
-            for (int t=0; t < BLOCKS_PER_COLOUR; t++)
+            for (int t=0; t < TILES_PER_SET; t++)
             {
-               DeActivateTile(tColours[t]);
+               DeActivateTile(tTilesOfColourSet[t]);
+               
             }
         }
 
@@ -243,7 +207,7 @@ public class ConstructFloor : MonoBehaviour {
         if ( Input.GetKeyDown(KeyCode.R))
         {
             int randomColour = rand.Next(0, colours.Length);
-            ActivateBlockSet();
+            ActivateTileSet(randomColour);
         }
     }
 }
