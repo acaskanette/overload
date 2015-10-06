@@ -5,19 +5,42 @@ using System;
 
 public class FloorScript : MonoBehaviour {
 
-    public GameObject floortile;  
+    [SerializeField]
+    private GameObject floortile;                // What's spawned as my floor
+    [SerializeField]
+    private GameObject wallTile;                 // What's spawned as my walls
 
-    public int sizeOfGrid = 9; // should be odd
-    public int sizeOfTile = 1;
+    [SerializeField]
+    private int sizeOfGrid = 9;                  // size of the square grid, should be odd
+    [SerializeField]
+    private int sizeOfTile = 1;                  // physical game world size of the tile
 
-    public const int TILES_PER_SET = 3;
+    [SerializeField]
+    private const int TILES_PER_SET = 3;         // How many tiles are in a set when they are lit up
 
     private System.Random rand;
 
-    private Color[] colours = { Color.red, Color.yellow, Color.cyan, Color.magenta };
+    private Color[] colours = { Color.red, Color.yellow, Color.cyan, Color.magenta };       
+                                                // Colours my tiles may randomize to
    
-    private GameObject[,] floor;    // 2D array of floortiles
+    private GameObject[,] floor;                // 2D array of floortiles
+    private TileScript[,] floorScripts;         // 2D array of the matching floortile's TileScripts
+
+    private SpawnerManager spawnerManager;      // Spawner Manager reference
+
+
+    // How big my grid of floor is
+    public int GetSizeOfGrid()
+    {
+        return sizeOfGrid;
+    }
     
+    // How many colours I have in my array 
+    public int GetColoursLength()
+    {
+        return colours.Length;
+    }
+
 
 
     /// <summary>
@@ -26,10 +49,12 @@ public class FloorScript : MonoBehaviour {
     void Start () {
 
         rand = new System.Random();
+        spawnerManager = GameObject.FindWithTag("Manager").GetComponent<SpawnerManager>();
 
-        BuildFloor();                       // Builds the main floor of the level
-        BuildWalls();                       // Builds walls around the level            
-        ActivateTileSet(rand.Next(0,colours.Length));                 // Activate one block set
+        BuildFloor();                           // Builds the main floor of the level
+        BuildWalls();                           // Builds walls around the level   
+        BuildSpawners();                        // Build spawners in the level
+        
 
     }
 
@@ -41,6 +66,7 @@ public class FloorScript : MonoBehaviour {
     {
         // Instantiate floor struct
         floor = new GameObject[sizeOfGrid, sizeOfGrid];
+        floorScripts = new TileScript[sizeOfGrid, sizeOfGrid];
 
         int startPoint = -(sizeOfGrid / 2); // upper left bound of the grid
         
@@ -49,12 +75,17 @@ public class FloorScript : MonoBehaviour {
             for (int j = 0; j < sizeOfGrid; j++)
             {
 
-                floor[i, j] = (GameObject)(GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0, (startPoint + j) * sizeOfTile), Quaternion.identity));                
+                floor[i,j] = (GameObject)(GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0, (startPoint + j) * sizeOfTile), Quaternion.identity));
+                floorScripts[i,j] = floor[i,j].GetComponent<TileScript>();
 
             }
         }
     }
 
+
+    /// <summary>
+    /// Builds the Walls
+    /// </summary>
     void BuildWalls()
     {
 
@@ -63,20 +94,40 @@ public class FloorScript : MonoBehaviour {
         // Make walls
         for (int i = 0; i < sizeOfGrid + 2; i++)
         {
-            GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0.5f, sizeOfGrid + 1), Quaternion.identity);
-            GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0.5f, -(sizeOfGrid + 1)), Quaternion.identity);
+            GameObject.Instantiate(wallTile, new Vector3((startPoint + i) * sizeOfTile, 0.5f, sizeOfGrid + 1), Quaternion.identity);    // top wall
+            GameObject.Instantiate(wallTile, new Vector3((startPoint + i) * sizeOfTile, 0.5f, -(sizeOfGrid + 1)), Quaternion.identity); // bottom wall
             
             if (i != 0 || i != (sizeOfGrid + 1))
             {
-                GameObject.Instantiate(floortile, new Vector3(-(sizeOfGrid + 1), 0.5f, (startPoint + i) * sizeOfTile), Quaternion.identity);
-                GameObject.Instantiate(floortile, new Vector3((sizeOfGrid + 1), 0.5f, (startPoint + i) * sizeOfTile), Quaternion.identity);
+                GameObject.Instantiate(wallTile, new Vector3(-(sizeOfGrid + 1), 0.5f, (startPoint + i) * sizeOfTile), Quaternion.identity); // side wall
+                GameObject.Instantiate(wallTile, new Vector3((sizeOfGrid + 1), 0.5f, (startPoint + i) * sizeOfTile), Quaternion.identity);  // other side wall
             }
 
         }
     }
 
 
-    void ActivateTileSet(int randomColour)
+    /// <summary>
+    /// Builds the Spawners
+    /// </summary>
+    void BuildSpawners()
+    {        
+        spawnerManager.CreateSpawner(floor[0,0].transform, colours[0], 0);  // Make Red Spawner
+        ActivateTileSet(colours[0]);                                        // Activate red block set
+        spawnerManager.CreateSpawner(floor[0,8].transform, colours[1], 1);  // Make Yellow Spawner
+        ActivateTileSet(colours[1]);                                        // Activate yellow block set
+        spawnerManager.CreateSpawner(floor[8,0].transform, colours[2], 2);  // Cyan Spawner
+        ActivateTileSet(colours[2]);                                        // Activate cyan block set
+        spawnerManager.CreateSpawner(floor[8,8].transform, colours[3], 3);  // Magenta Spawner
+        ActivateTileSet(colours[3]);                                        // Activate magenta block set
+    }
+
+
+    /// <summary>
+    /// Activates a tile set of the given colour
+    /// </summary>
+    /// <param name="_colour">index of the colour array</param>
+    void ActivateTileSet(Color _colour)
     {
 
         GameObject activeTile;                                  // FloorTile to light up
@@ -93,7 +144,7 @@ public class FloorScript : MonoBehaviour {
                 // Grab a random tile
                 activeTile = GetInactiveTile();
                 // Activate it
-                ActivateTile(activeTile, colours[randomColour]);
+                ActivateTile(activeTile, _colour);
             }
         }            
 
@@ -110,10 +161,8 @@ public class FloorScript : MonoBehaviour {
         int x, y;
         x = rand.Next(0, sizeOfGrid);
         y = rand.Next(0, sizeOfGrid);
-
-        BlockScript tileScript = floor[x, y].GetComponent<BlockScript>();
-        
-        if ( tileScript.IsActive() )       // If it's Active
+                
+        if ( floorScripts[x,y].IsActive() )       // If it's Active
             return GetInactiveTile();      // Get a new one                   
         else
             return floor[x, y];            // Otherwise, return it
@@ -131,9 +180,8 @@ public class FloorScript : MonoBehaviour {
         for (int i = 0; i < sizeOfGrid; i++)
         {
             for (int j = 0; j < sizeOfGrid; j++)
-            {
-                BlockScript tileScript = floor[i, j].GetComponent<BlockScript>();
-                allActive = allActive && tileScript.IsActive();
+            {                
+                allActive = allActive && floorScripts[i,j].IsActive();
             }
         }
         return allActive;
@@ -146,9 +194,9 @@ public class FloorScript : MonoBehaviour {
     /// <param name="_floorTile">Which tile to activate.</param>    
     /// <param name="_color">Colour the tile will glow.</param>
     private void ActivateTile(GameObject _floorTile, Color _colour) {
-        print("ActivateTile");
-        BlockScript tileScript = _floorTile.GetComponent<BlockScript>();
-        tileScript.ActivateTile(_colour);
+       
+        //print("ActivateTile");
+        _floorTile.GetComponent<TileScript>().ActivateTile(_colour);
                        
     }
 
@@ -161,7 +209,7 @@ public class FloorScript : MonoBehaviour {
     /// <param name="_color"></param>
     private void DeActivateTile(GameObject _floorTile)
     {
-        _floorTile.GetComponent<BlockScript>().DeactivateTile();         
+        _floorTile.GetComponent<TileScript>().DeactivateTile();         
     }
 
 
@@ -175,39 +223,75 @@ public class FloorScript : MonoBehaviour {
         GameObject[] tTilesOfColourSet = new GameObject[TILES_PER_SET];
         
         int tColoursIndex = 0;
-        
+        int numberTouched = 0;
+
         for (int i = 0; i < sizeOfGrid; i++)
         {
             for (int j = 0; j < sizeOfGrid; j++)
-            {
-                BlockScript tileScript = floor[i, j].GetComponent<BlockScript>();
-                if (tileScript.GetColour() == _colour)      // If the tile is the colour I'm checking
+            {                
+                if (floorScripts[i,j].GetColour() == _colour)      // If the tile is the colour I'm checking
                 {
-                    allTouched = allTouched && tileScript.IsTouched();    // Then see if it's all touched
+                    allTouched = allTouched && floorScripts[i,j].IsTouched();    // Then see if it's all touched
                     tTilesOfColourSet[tColoursIndex] = floor[i, j];
                     tColoursIndex++;
+                    if (floorScripts[i, j].IsTouched())
+                        numberTouched++;
                 }
             }
         }
 
+        for (int p = 0; p < tTilesOfColourSet.Length; p++)
+        {
+            float pitch = 0.8f + 0.2f * numberTouched;
+            tTilesOfColourSet[p].GetComponent<TileScript>().ChangePitch(pitch);
+        }
+
+        // If all of the blocks in the set have been touched
         if (allTouched)
         {
-            for (int t=0; t < TILES_PER_SET; t++)
+
+            // Kills all the enemies of that colour
+            spawnerManager.KillSpawnsOfColour(_colour);
+
+            // Deactivate all the Tiles of this colour
+            for (int t = 0; t < TILES_PER_SET; t++)
             {
-               DeActivateTile(tTilesOfColourSet[t]);
-               
+                //print("deactivating tile: " + t);
+                DeActivateTile(tTilesOfColourSet[t]);       // Deactivate them all
             }
+
+            StartCoroutine(CheckRespawn(_colour));            
+
         }
 
     }
 
-	
+    private IEnumerator CheckRespawn(Color _colour)
+    {
+
+        yield return new WaitForSeconds(3.1f);
+     
+        // Check if there are any more enemies of this colour waiting to be spawned
+        if (spawnerManager.CheckAnyMoreToSpawn(_colour))
+        // Create a new set of tiles of this colour (if true)
+        {
+            print("Activating Tileset after a kill");
+            ActivateTileSet(_colour);
+        }
+        
+    }
+
+
+
+	/// <summary>
+	/// Update the floor
+	/// </summary>
 	void Update () {
 
         if ( Input.GetKeyDown(KeyCode.R))
         {
             int randomColour = rand.Next(0, colours.Length);
-            ActivateTileSet(randomColour);
+            ActivateTileSet(colours[randomColour]);
         }
     }
 }

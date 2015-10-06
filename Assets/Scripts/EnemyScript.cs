@@ -3,6 +3,8 @@ using System.Collections;
 
 public class EnemyScript : MonoBehaviour {
 
+    [SerializeField]
+    private GameObject deathEffect;         // Particle system on death
 
     public float Speed = 10;         // How fast the enemy moves to chase the player
     Color colour;               // Type of enemy, what colour it glows
@@ -52,6 +54,7 @@ public class EnemyScript : MonoBehaviour {
     {
         // play death animations/sounds
         // wait til they're done
+        GameObject.Instantiate(deathEffect, gameObject.transform.position, Quaternion.identity);
         GameObject.Destroy(this.gameObject);
     }
 
