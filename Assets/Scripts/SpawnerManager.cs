@@ -38,7 +38,7 @@ public class SpawnerManager : MonoBehaviour {
     public void CreateSpawner(Transform _location, Color _colour, int _index)
     {
         // Create a spawner
-        spawnerList[_index] = (GameObject)GameObject.Instantiate(spawnerObject, _location.position, Quaternion.identity);
+        spawnerList[_index] = (GameObject)GameObject.Instantiate(spawnerObject, _location.position + new Vector3(0.0f,1.5f,0.0f), Quaternion.identity);
         // Set its colour
         spawnerList[_index].GetComponent<EnemySpawnScript>().SetSpawnColour(_colour);
     }
@@ -85,6 +85,19 @@ public class SpawnerManager : MonoBehaviour {
 
     }
 
+
+    // Take all enemies on the screen and put them back into their Spawner
+    public void ResetSpawners()
+    {
+        for (int i = 0; i < spawnerList.Length; i++)
+        {
+            if (spawnerList[i] != null)
+            {
+                EnemySpawnScript tSpawnScript = spawnerList[i].GetComponent<EnemySpawnScript>();
+                tSpawnScript.ResetSpawner();
+            }
+        }
+    }
 
 
 	
