@@ -15,6 +15,7 @@ public class TileScript : MonoBehaviour {
 
     GameObject managerObject;       // Where my manager at?
 
+    float tileGlow;
     float currentPitch;
 
     // Getter for IsActive
@@ -42,6 +43,12 @@ public class TileScript : MonoBehaviour {
         isActive = false;
         isTouched = false;
         colour = defaultColour;
+        tileGlow = 0.0f;                
+    }
+
+    void Start()
+    {
+        GetComponent<Renderer>().material.SetFloat("_MKGlowPower", tileGlow);
         managerObject = GameObject.FindGameObjectWithTag("Manager");
     }
   
@@ -50,8 +57,8 @@ public class TileScript : MonoBehaviour {
     public void ActivateTile(Color _colour)
     {
         isActive = true;        
-        colour = _colour;
-        GetComponent<Renderer>().material.SetColor("_MKGlowColor", colour);
+        colour = _colour;        
+        GetComponent<Renderer>().material.SetColor("_MKGlowColor", colour);        
     }
 
    
@@ -61,6 +68,8 @@ public class TileScript : MonoBehaviour {
         isActive = false;
         isTouched = false;
         colour = defaultColour;
+        tileGlow = 0.0f;
+        GetComponent<Renderer>().material.SetFloat("_MKGlowPower", tileGlow);
         GetComponent<Renderer>().material.SetColor("_MKGlowColor", colour);
         GetComponent<Renderer>().material.SetTexture("_MKGlowTex", defaultTexture);
     }
@@ -92,8 +101,13 @@ public class TileScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        
 
+        if (isActive)
+        {
+            tileGlow = Mathf.Cos(Time.timeSinceLevelLoad)/2.0f+1.25f;
+            //print("Glow Factor: " + tileGlow);
+            GetComponent<Renderer>().material.SetFloat("_MKGlowPower", tileGlow);
+        }
 
 	}
 }

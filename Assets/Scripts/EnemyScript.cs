@@ -8,9 +8,7 @@ public class EnemyScript : MonoBehaviour {
 
     public float Speed = 10;         // How fast the enemy moves to chase the player
     Color colour;               // Type of enemy, what colour it glows
-    
-    private Color[] colours = { Color.red, Color.yellow, Color.cyan, Color.magenta };   // Colours enemy can be
-    
+            
     private GameObject player;  // Reference to the player in the scene
         
     // Use this for initialization
@@ -43,9 +41,8 @@ public class EnemyScript : MonoBehaviour {
     private void Chase()
     {
  
-        transform.LookAt(player.transform);
- 
-        transform.position += transform.forward*Speed*Time.deltaTime;
+       transform.LookAt(player.transform);
+       transform.position += transform.forward*Speed*Time.deltaTime;
         
     }
 
@@ -53,8 +50,12 @@ public class EnemyScript : MonoBehaviour {
     public void Kill()
     {
         // play death animations/sounds
-        // wait til they're done
         GameObject.Instantiate(deathEffect, gameObject.transform.position, Quaternion.identity);
+        GameObject.Destroy(this.gameObject);
+    }
+
+    public void Destroy()
+    {               
         GameObject.Destroy(this.gameObject);
     }
 

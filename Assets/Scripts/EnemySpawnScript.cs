@@ -135,10 +135,25 @@ public class EnemySpawnScript : MonoBehaviour {
     public bool AnyMoreToSpawn()    {
         return (numberSpawned < MAX_NUMBER_OF_SPAWNS);
     }
+
+
+    /// <summary>
+    /// Take all the active enemies and put them back into the spawner to be spawned again
+    /// </summary>
+    public void ResetSpawner()
+    {
+        for (int i = 0; i < spawnedEnemies.Length; i++)
+        {
+            if (spawnedEnemies[i] != null) {
+                numberSpawned--;
+                spawnedEnemies[i].GetComponent<EnemyScript>().Destroy();
+                spawnedEnemies[i] = null;
+            }
+        }
+    }
 	
 	// Update is called once per frame
 	void Update () {
-
         
         timeBetweenSpawns += Time.deltaTime;
 
