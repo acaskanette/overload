@@ -6,7 +6,7 @@ public class EnemyScript : MonoBehaviour {
     [SerializeField]
     private GameObject deathEffect;         // Particle system on death
 
-    public float Speed = 10;         // How fast the enemy moves to chase the player
+    public float Speed = 1.0f;         // How fast the enemy moves to chase the player
     Color colour;               // Type of enemy, what colour it glows
             
     private GameObject player;  // Reference to the player in the scene
@@ -30,7 +30,7 @@ public class EnemyScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        Chase();
+       Chase();
 
 	}
 
@@ -50,8 +50,9 @@ public class EnemyScript : MonoBehaviour {
     public void Kill()
     {
         // play death animations/sounds
+        GameObject.FindWithTag("Manager").GetComponent<ScoreManager>().EnemyKilled();
         GameObject.Instantiate(deathEffect, gameObject.transform.position, Quaternion.identity);
-        GameObject.Destroy(this.gameObject);
+        Destroy();
     }
 
     public void Destroy()

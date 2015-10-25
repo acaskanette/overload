@@ -78,7 +78,10 @@ public class TileScript : MonoBehaviour {
     void OnTriggerEnter(Collider _other)     // OnTouched
     {        
         if (isActive && !isTouched && _other.tag == "Player") {  // If this tile's active and it hasn't been touched yet and the player entered
-            // other.GetComponent<ConstructFloor>().TouchedTile(gameObject);              
+                        
+            // Add Score
+            managerObject.GetComponent<ScoreManager>().SteppedOn(colour);
+                        
             isTouched = true;            
             GetComponent<Renderer>().material.SetTexture("_MKGlowTex", touchedTexture);
             managerObject.GetComponent<FloorScript>().CheckDoneAndDeactivate(colour);
@@ -86,6 +89,8 @@ public class TileScript : MonoBehaviour {
             // Set Pitch
             GetComponent<AudioSource>().pitch = currentPitch;
             GetComponent<AudioSource>().Play();
+
+            
         }
 
         //if (other.tag == "Player")

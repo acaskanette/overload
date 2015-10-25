@@ -8,8 +8,7 @@ public class SpawnerManager : MonoBehaviour {
     private GameObject spawnerObject;
 
     // Some spawners
-    private GameObject[] spawnerList;
-    //private Transform[] spawnerLocations;
+    private GameObject[] spawnerList;    
 
     private int maxNumberColours;
 

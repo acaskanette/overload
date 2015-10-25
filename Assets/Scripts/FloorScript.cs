@@ -29,6 +29,34 @@ public class FloorScript : MonoBehaviour {
     private SpawnerManager spawnerManager;      // Spawner Manager reference
 
 
+
+    // Give the GameObject of the tile at those indices
+    public GameObject GetTileByIndex(int _i, int _j) {
+        return floor[_i, _j];
+    }
+
+
+    // Find the Tile by GameObject reference
+    public Vector2 GetTileIndicesByGameObject(GameObject _tile)
+    {
+
+        Vector2 tTileLocation = new Vector2(-999,-999);
+
+        for (int i = 0; i < sizeOfGrid; i++)
+        {
+            for (int j = 0; j < sizeOfGrid; j++)
+            {
+                if (_tile == floor[i, j])
+                {
+                    tTileLocation = new Vector2(i, j);
+                }
+            }
+        }
+        return tTileLocation;
+
+    }
+
+
     // How big my grid of floor is
     public int GetSizeOfGrid()
     {
@@ -280,7 +308,7 @@ public class FloorScript : MonoBehaviour {
         }
         
     }
-
+   
 
 
 	/// <summary>
