@@ -2,25 +2,26 @@
 using System.Collections;
 
 
-[RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(CharacterController))]
 
 public class OverloadCharacterControllor : MonoBehaviour {
     
 
-    // Speed
-    [SerializeField]
+    // Speed    
     private const float MAX_SPEED = 5f;        // How fast I can go
     [SerializeField]
     private float currentSpeed = 0.0f;         // How fast I am going
     [SerializeField]
-    private float acceleration = 1.0f;         // How fast I accelerate while holding the button
+    private float acceleration = 1.0f;         // How fast I accelerate
 
     const float STOPPING_DISTANCE = 0.53f;     // Distance between player and target tile before they stop
 
-    private Vector3 moveDirection;             // of travel
+    private Vector3 moveDirection;             // of travel        
 
     Vector3 targetPosition;                    // Where I clicked to move
+
+    [SerializeField]
+    private Animator animator;                 // The Animator for the character
 
 
 	// Use this for initialization
@@ -45,7 +46,7 @@ public class OverloadCharacterControllor : MonoBehaviour {
             {
                 if (hit.collider.tag == "Tile")
                 {
-                    print("Tile hit!");
+                  //  print("Tile hit!");
                     //CharacterController controller = GetComponent<CharacterController>();
                    
                     
@@ -54,12 +55,15 @@ public class OverloadCharacterControllor : MonoBehaviour {
                         
                         // Capture information about the tile hit
                         targetPosition = hit.point;
-                        print("Hit Point: " + hit.point);
+                  //      print("Hit Point: " + hit.point);
                        // print(targetTile);
 
                         currentSpeed = 0.0f;
                         moveDirection = (targetPosition - gameObject.transform.position);
+                        
                         moveDirection.Normalize();
+
+                        gameObject.transform.LookAt(hit.collider.gameObject.transform);
                        // print(moveDirection);
    
                     //}
@@ -76,7 +80,8 @@ public class OverloadCharacterControllor : MonoBehaviour {
           //  print("accelerating....");
             moveDirection = (targetPosition - gameObject.transform.position);
             moveDirection.Normalize();
-            currentSpeed += acceleration;            
+            currentSpeed += acceleration;
+            print(currentSpeed);
         }        
         else {
         // otherwise, it is low so slow the eff down
@@ -92,8 +97,11 @@ public class OverloadCharacterControllor : MonoBehaviour {
             moveDirection *= MAX_SPEED;
         }
 
+
+
         currentSpeed = Mathf.Clamp(currentSpeed, 0.0f, MAX_SPEED);
-                
+        animator.SetFloat("moveSpeed", currentSpeed);
+        
         // print("Target Point: " + targetPosition + "  My position: " + gameObject.transform.position + "   Mag: " + (targetPosition - transform.position).magnitude);
 
 

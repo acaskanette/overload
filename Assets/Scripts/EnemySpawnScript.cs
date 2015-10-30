@@ -4,9 +4,9 @@ using System.Collections;
 public class EnemySpawnScript : MonoBehaviour {
 
 	
-    public const float TIME_BETWEEN_SPAWNS = 3.0f;  // in seconds
-    public const int MAX_ENEMIES_AT_ONE_TIME = 3;   // how many enemies this spawner can control
-    public const int MAX_NUMBER_OF_SPAWNS = 5;      // how many I'll spawn before I stop spawning
+    public const float TIME_BETWEEN_SPAWNS = 5.0f;  // in seconds
+    public const int MAX_ENEMIES_AT_ONE_TIME = 2;   // how many enemies this spawner can control
+    public const int MAX_NUMBER_OF_SPAWNS = 4;      // how many I'll spawn before I stop spawning
 
     public GameObject enemyGameObject;              // What enemy am I spawning
 
@@ -16,7 +16,7 @@ public class EnemySpawnScript : MonoBehaviour {
 
     private Color spawnColour;                      // Colour of enemies spawned
 
-    float timeBetweenSpawns = 3.0f;                 // Default seconds between enemies spawn
+    float timeBetweenSpawns = 2.0f;                 // Default seconds between enemies spawn
 
     // Setter for spawnColour;
     public void SetSpawnColour (Color _spawnColour) {
@@ -40,7 +40,7 @@ public class EnemySpawnScript : MonoBehaviour {
             spawnedEnemies[i] = null;
         }
         
-        spawnIndex = NextSpawnIndex();        
+        spawnIndex = 0;        
   
 	}
 
@@ -97,14 +97,14 @@ public class EnemySpawnScript : MonoBehaviour {
 
     IEnumerator MakeDeathSounds()
     {
-        print("DeathSoundStarted");
+        //print("DeathSoundStarted");
         AudioSource firework = GetComponent<AudioSource>();
         
         firework.Play();
 
         yield return new WaitForSeconds(0.7f);
 
-        print("Miniwait");
+        //print("Miniwait");
         firework.mute = true;
 
         yield return new WaitForSeconds(2.4f);
@@ -121,9 +121,9 @@ public class EnemySpawnScript : MonoBehaviour {
 
         }
 
-        spawnIndex = NextSpawnIndex();
+        spawnIndex = 0;
 
-        print("DeathSoundEnded");
+       // print("DeathSoundEnded");
     }
 
 
@@ -147,9 +147,10 @@ public class EnemySpawnScript : MonoBehaviour {
             if (spawnedEnemies[i] != null) {
                 numberSpawned--;
                 spawnedEnemies[i].GetComponent<EnemyScript>().Destroy();
-                spawnedEnemies[i] = null;
+                spawnedEnemies[i] = null;                
             }
         }
+        spawnIndex = NextSpawnIndex();
     }
 	
 	// Update is called once per frame
