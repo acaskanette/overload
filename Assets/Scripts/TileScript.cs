@@ -43,14 +43,10 @@ public class TileScript : MonoBehaviour {
         isActive = false;
         isTouched = false;
         colour = defaultColour;
-        tileGlow = 0.0f;                
-    }
-
-    void Start()
-    {
+        tileGlow = 0.0f;
         GetComponent<Renderer>().material.SetFloat("_MKGlowPower", tileGlow);
         managerObject = GameObject.FindGameObjectWithTag("Manager");
-    }
+    }    
   
     
     // Activates a tile
@@ -78,7 +74,7 @@ public class TileScript : MonoBehaviour {
     void OnTriggerEnter(Collider _other)     // OnTouched
     {        
         if (isActive && !isTouched && _other.tag == "Player") {  // If this tile's active and it hasn't been touched yet and the player entered
-                        
+            Debug.Log("Mgr: " + managerObject);            
             // Add Score
             managerObject.GetComponent<ScoreManager>().SteppedOn(colour);
                         

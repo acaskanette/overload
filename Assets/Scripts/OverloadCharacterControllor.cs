@@ -46,27 +46,25 @@ public class OverloadCharacterControllor : MonoBehaviour {
             {
                 if (hit.collider.tag == "Tile")
                 {
-                  //  print("Tile hit!");
-                    //CharacterController controller = GetComponent<CharacterController>();
-                   
-                    
-                    //if (controller.isGrounded)
-                    //{
-                        
-                        // Capture information about the tile hit
-                        targetPosition = hit.point;
-                  //      print("Hit Point: " + hit.point);
-                       // print(targetTile);
+                    // Capture information about the tile hit
+                    targetPosition = hit.point;
+                    targetPosition.y = 1.5f;
+                    print("Target:" + targetPosition);
+                    // Mousepos to world points
 
-                        currentSpeed = 0.0f;
-                        moveDirection = (targetPosition - gameObject.transform.position);
-                        
-                        moveDirection.Normalize();
-
-                        gameObject.transform.LookAt(hit.collider.gameObject.transform);
-                       // print(moveDirection);
-   
-                    //}
+                    // Create a Vector between new mousepos and my pos
+                    Vector3 v = targetPosition - gameObject.transform.position;
+                    print("V: " + v);
+                    //Get angle from facing
+                    float theta = Mathf.Atan2(v.x, v.z);
+                    print(theta);
+                    // gameObject.transform.LookAt(hit.collider.gameObject.transform);
+                    transform.rotation = Quaternion.Euler(0, (theta * Mathf.Rad2Deg)-90, 0);
+                                    
+                    currentSpeed = 0.0f;
+                    moveDirection = v;
+                    moveDirection.Normalize();                                      
+                     
                     
                 }
             }
@@ -81,7 +79,7 @@ public class OverloadCharacterControllor : MonoBehaviour {
             moveDirection = (targetPosition - gameObject.transform.position);
             moveDirection.Normalize();
             currentSpeed += acceleration;
-            print(currentSpeed);
+           // print(currentSpeed);
         }        
         else {
         // otherwise, it is low so slow the eff down
