@@ -6,15 +6,18 @@ public class EnemyScript : MonoBehaviour {
     [SerializeField]
     private GameObject deathEffect;         // Particle system on death
 
-    public float Speed = 1.0f;         // How fast the enemy moves to chase the player
+    public float Speed = 0.5f;         // How fast the enemy moves to chase the player
     Color colour;               // Type of enemy, what colour it glows
             
     private GameObject player;  // Reference to the player in the scene
+    private Rigidbody rigidBody;
+
         
     // Use this for initialization
 	void Start () {
 
         player = (GameObject)(GameObject.FindWithTag("Player"));
+        rigidBody = GetComponent<Rigidbody>();
       	
 	}
 
@@ -42,7 +45,7 @@ public class EnemyScript : MonoBehaviour {
     {
  
        transform.LookAt(player.transform);
-       transform.position += transform.forward*Speed*Time.deltaTime;
+       rigidBody.AddForce(transform.forward * Speed, ForceMode.Acceleration);
         
     }
 
@@ -51,7 +54,8 @@ public class EnemyScript : MonoBehaviour {
     {
         // play death animations/sounds
         GameObject.FindWithTag("Manager").GetComponent<ScoreManager>().EnemyKilled();
-        GameObject.Instantiate(deathEffect, gameObject.transform.position, Quaternion.identity);
+        GameObject deathEffectInstance = (GameObject)GameObject.Instantiate(deathEffect, gameObject.transform.position, Quaternion.identity);
+        deathEffectInstance.GetComponent<EnemyExplosionScript>().SetColour(colour);
         Destroy();
     }
 

@@ -14,6 +14,8 @@ public class TileScript : MonoBehaviour {
     public Texture defaultTexture;  // No texture applied after block deactivated
 
     GameObject managerObject;       // Where my manager at?
+    [SerializeField]
+    private GameObject activateParticle;       // Particle System to spawn when activated   
 
     float tileGlow;
     float currentPitch;
@@ -45,7 +47,7 @@ public class TileScript : MonoBehaviour {
         colour = defaultColour;
         tileGlow = 0.0f;
         GetComponent<Renderer>().material.SetFloat("_MKGlowPower", tileGlow);
-        managerObject = GameObject.FindGameObjectWithTag("Manager");
+        managerObject = GameObject.FindGameObjectWithTag("Manager");        
     }    
   
     
@@ -54,7 +56,10 @@ public class TileScript : MonoBehaviour {
     {
         isActive = true;        
         colour = _colour;        
-        GetComponent<Renderer>().material.SetColor("_MKGlowColor", colour);        
+        GetComponent<Renderer>().material.SetColor("_MKGlowColor", colour);
+        GameObject activateParticleInstance = (GameObject)GameObject.Instantiate(activateParticle, transform.position, Quaternion.identity);
+        activateParticleInstance.GetComponent<SpawnTileEmitterScript>().SetColour(colour);
+       
     }
 
    

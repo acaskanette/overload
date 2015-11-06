@@ -9,7 +9,8 @@ public class FloorScript : MonoBehaviour {
     private GameObject floortile;                // What's spawned as my floor
     [SerializeField]
     private GameObject wallTile;                 // What's spawned as my walls
-
+    [SerializeField]
+    private GameObject obstacleTile;              // What obstacles are made of
     [SerializeField]
     private int sizeOfGrid = 9;                  // size of the square grid, should be odd
     [SerializeField]
@@ -17,13 +18,15 @@ public class FloorScript : MonoBehaviour {
 
     [SerializeField]
     private const int TILES_PER_SET = 3;         // How many tiles are in a set when they are lit up
+    private const int NUMBER_OF_OBSTACLES = 4;
 
     private System.Random rand;
 
-    private Color[] colours = { Color.red, Color.yellow, Color.cyan, Color.magenta };       
+    private Color[] colours = { Color.green, Color.yellow, Color.cyan, Color.magenta };       
                                                 // Colours my tiles may randomize to
    
     private GameObject[,] floor;                // 2D array of floortiles
+    private GameObject[] obstacles;             // Array of obstacles (2nd floor)
     private TileScript[,] floorScripts;         // 2D array of the matching floortile's TileScripts
 
     private SpawnerManager spawnerManager;      // Spawner Manager reference
@@ -74,16 +77,21 @@ public class FloorScript : MonoBehaviour {
     /// <summary>
     /// Startup: Instantiate all variables
     /// </summary>
-    void Start () {
+    void Awake () {
 
         rand = new System.Random();
         spawnerManager = GameObject.FindWithTag("Manager").GetComponent<SpawnerManager>();
 
-        BuildFloor();                           // Builds the main floor of the level
+        BuildFloor();                           // Builds the main floor of the level and the obstacles (2nd floor)
         BuildWalls();                           // Builds walls around the level   
-        BuildSpawners();                        // Build spawners in the level
+       
         
 
+    }
+
+    void Start()
+    {
+        BuildSpawners();                        // Build spawners in the level
     }
 
 
@@ -94,6 +102,7 @@ public class FloorScript : MonoBehaviour {
     {
         // Instantiate floor struct
         floor = new GameObject[sizeOfGrid, sizeOfGrid];
+        obstacles = new GameObject[NUMBER_OF_OBSTACLES];
         floorScripts = new TileScript[sizeOfGrid, sizeOfGrid];
 
         int startPoint = -(sizeOfGrid / 2); // upper left bound of the grid
@@ -103,10 +112,18 @@ public class FloorScript : MonoBehaviour {
             for (int j = 0; j < sizeOfGrid; j++)
             {
 
-                floor[i,j] = (GameObject)(GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0, (startPoint + j) * sizeOfTile), Quaternion.identity));
+                floor[i,j] = (GameObject)(GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0, (startPoint + j) * sizeOfTile), Quaternion.identity));                
                 floorScripts[i,j] = floor[i,j].GetComponent<TileScript>();
 
             }
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            int x = rand.Next(startPoint+1, -startPoint);
+            int z = rand.Next(startPoint+1, -startPoint);
+            if ( !( x == 0 && z == 0) )     // Unless it's the center tile
+                obstacles[i] = (GameObject)(GameObject.Instantiate(obstacleTile, new Vector3(x * sizeOfTile, 1.5f, z * sizeOfTile), Quaternion.identity));                
         }
     }
 
@@ -122,13 +139,13 @@ public class FloorScript : MonoBehaviour {
         // Make walls
         for (int i = 0; i < sizeOfGrid + 2; i++)
         {
-            GameObject.Instantiate(wallTile, new Vector3((startPoint + i) * sizeOfTile, 0.5f, sizeOfGrid + 1), Quaternion.identity);    // top wall
-            GameObject.Instantiate(wallTile, new Vector3((startPoint + i) * sizeOfTile, 0.5f, -(sizeOfGrid + 1)), Quaternion.identity); // bottom wall
+            GameObject.Instantiate(wallTile, new Vector3((startPoint + i) * sizeOfTile, 2.0f, sizeOfGrid + 1), Quaternion.identity);    // top wall
+            GameObject.Instantiate(wallTile, new Vector3((startPoint + i) * sizeOfTile, 2.0f, -(sizeOfGrid + 1)), Quaternion.identity); // bottom wall
             
             if (i != 0 || i != (sizeOfGrid + 1))
             {
-                GameObject.Instantiate(wallTile, new Vector3(-(sizeOfGrid + 1), 0.5f, (startPoint + i) * sizeOfTile), Quaternion.identity); // side wall
-                GameObject.Instantiate(wallTile, new Vector3((sizeOfGrid + 1), 0.5f, (startPoint + i) * sizeOfTile), Quaternion.identity);  // other side wall
+                GameObject.Instantiate(wallTile, new Vector3(-(sizeOfGrid + 1), 2.0f, (startPoint + i) * sizeOfTile), Quaternion.identity); // side wall
+                GameObject.Instantiate(wallTile, new Vector3((sizeOfGrid + 1), 2.0f, (startPoint + i) * sizeOfTile), Quaternion.identity);  // other side wall
             }
 
         }
@@ -190,11 +207,31 @@ public class FloorScript : MonoBehaviour {
         x = rand.Next(0, sizeOfGrid);
         y = rand.Next(0, sizeOfGrid);
                 
-        if ( floorScripts[x,y].IsActive() )       // If it's Active
+        if ( floorScripts[x,y].IsActive() || (x==sizeOfGrid/2 && y==sizeOfGrid/2) || IsUnderAnObstacle(x,y))       // If it's Active or the center tile or under an obstacle
             return GetInactiveTile();      // Get a new one                   
         else
             return floor[x, y];            // Otherwise, return it
 
+    }
+
+
+
+    /// <summary>
+    /// Returns true if the tile at location x, y is directly below an obstacle
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    private bool IsUnderAnObstacle(int x, int y)
+    {
+        bool isUnder = false;
+
+        for (int i = 0 ; i < NUMBER_OF_OBSTACLES ; i++) {
+            if (floor[x, y].transform.position.x == obstacles[i].transform.position.x && floor[x, y].transform.position.z == obstacles[i].transform.position.z)
+                isUnder = true;
+        }
+        
+        return isUnder;
     }
 
 

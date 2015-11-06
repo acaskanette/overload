@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+
 
 public class ScoreManager : MonoBehaviour {
 
@@ -17,8 +19,14 @@ public class ScoreManager : MonoBehaviour {
     private const int SCORE_MULTIPLIER_PER_TILE_HIT = 10;
     // Consts for enemy killing
     private const int BASE_SCORE_PER_ENEMY = 2;
-    private const float TIME_TO_REDUCE_KILLSTREAK = 3.0f;
+    private const float TIME_TO_REDUCE_KILLSTREAK = 1.5f;
     private float timeToReduceKillStreak = 0.0f;
+
+    [SerializeField]
+    private Text scoreText;
+    [SerializeField]
+    private Text multiplierText;
+ 
 
 
 	// Use this for initialization
@@ -26,7 +34,9 @@ public class ScoreManager : MonoBehaviour {
         currentScore = 0;
         previousScore = 0;
         steppedOnInARow = 0;
-        lastColourSteppedOn = Color.black;	
+        killedInARow = 0;
+        lastColourSteppedOn = Color.black;
+        UpdateScoreUI();
 	}
 
 
@@ -43,6 +53,7 @@ public class ScoreManager : MonoBehaviour {
                                                 // Add to score based on whatever formula you like
         lastColourSteppedOn = _colour;          // Update what colour was last hit
 
+        UpdateScoreUI();
         //print("Added: " + (BASE_SCORE_PER_TILE + SCORE_MULTIPLIER_PER_TILE_HIT * steppedOnInARow) + "  Total Score:" + currentScore);
 
     }
@@ -51,12 +62,14 @@ public class ScoreManager : MonoBehaviour {
     public void EnemyKilled()
     {
         killedInARow++;                  // increment how many I have stepped on in a row
-        print(killedInARow);
+        UpdateMultiplierUI();
         currentScore += Mathf.Pow(BASE_SCORE_PER_ENEMY,killedInARow);
-
+        UpdateScoreUI();
       // print("Added: " + Mathf.Pow(BASE_SCORE_PER_ENEMY, killedInARow) + "  Total Score:" + currentScore);
 
     }
+
+
 	
 	// Update is called once per frame
 	void Update () {
@@ -65,11 +78,26 @@ public class ScoreManager : MonoBehaviour {
         //print(timeToReduceKillStreak);
         if (timeToReduceKillStreak >= TIME_TO_REDUCE_KILLSTREAK)
         {
-            killedInARow=0;
-            print(killedInARow);
+            killedInARow--;
+            if (killedInARow < 0)
+                killedInARow = 0;
+            UpdateMultiplierUI();
             timeToReduceKillStreak = 0.0f;
         }
         
         
 	}
+
+    void UpdateScoreUI()
+    {
+        if (scoreText)
+            scoreText.text = currentScore.ToString();
+    }
+
+    void UpdateMultiplierUI()
+    {
+        if (multiplierText)
+            multiplierText.text = "x " + (killedInARow+1);
+    }
+
 }

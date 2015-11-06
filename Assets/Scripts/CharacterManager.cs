@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class CharacterManager : MonoBehaviour {
 
@@ -13,11 +14,43 @@ public class CharacterManager : MonoBehaviour {
 
     private StateManager stateManager;
 
+    [SerializeField]
+    private Animator animator;
+
+    bool hasDied;
+
+    [SerializeField]
+    private AudioClip shutdownSound;
+    [SerializeField]
+    private GameObject livesIcon;
+
+    [SerializeField]
+    private GameObject UICanvas;
+
+    private GameObject[] livesIconArray;
+
+
 
 	// Use this for initialization
 	void Start () {
         currentLives = STARTING_LIVES;              // Initialize number of lives
         stateManager = GameObject.FindGameObjectWithTag("Manager").GetComponent<StateManager>();
+        hasDied = false;
+        
+        // Set up UI for lives
+        livesIconArray = new GameObject[MAX_NUMBER_OF_LIVES];
+        for (int i = 0; i < MAX_NUMBER_OF_LIVES; i++)
+        {
+            if (i < STARTING_LIVES)
+            {
+                livesIconArray[i] = (GameObject)GameObject.Instantiate(livesIcon, Vector3.zero, Quaternion.identity);
+                livesIconArray[i].transform.parent = UICanvas.transform;
+                livesIconArray[i].GetComponent<RectTransform>().localPosition = new Vector3(-555.0f + i * 32.0f, -335.0f);
+            }
+            else
+                livesIconArray[i] = null;
+        }
+            
 	}
 
 
@@ -25,9 +58,9 @@ public class CharacterManager : MonoBehaviour {
     // Something hit the player, so let's process that
     void OnTriggerEnter(Collider _other)
     {
-        if (_other.tag == "Enemy")      // Oh no! An enemy hit me!
+        if (_other.tag == "Enemy" && !hasDied)      // Oh no! An enemy hit me!
         {
-            currentLives--;
+            LoseLife();            
             // Check if permanently dead
             if (OutOfLives())
             {
@@ -35,17 +68,43 @@ public class CharacterManager : MonoBehaviour {
             } 
             else {
                 // If not, Respawn in the center, send the enemies back into their spawners
-                Respawn();
-                stateManager.SetState(StateManager.GameState.RESET_STATE);   // If I am, Game Over man!
-
+                hasDied = true;
+                animator.SetBool("hasDied", hasDied);
+                StartCoroutine(OnDeath());
+                
             }
         }
+    }
+
+    IEnumerator OnDeath()
+    {
+        yield return new WaitForSeconds(3.0f);
+       
+        Respawn();
+        stateManager.SetState(StateManager.GameState.RESET_STATE);   // If I am, Game Over man!
+        
+    }
+
+
+
+    void LoseLife() {
+
+        if (currentLives > 0 && livesIconArray[currentLives - 1] != null)
+        {
+            GameObject.Destroy(livesIconArray[currentLives-1]);
+            livesIconArray[currentLives - 1] = null;
+            currentLives--;
+            AudioSource.PlayClipAtPoint(shutdownSound, transform.position);
+        }            
+    
     }
 
     // Respawn the player in the center of the level
     void Respawn()
     {
         gameObject.transform.position = new Vector3(0.0f, 1.5f, 0.0f);
+        hasDied = false;
+        animator.SetBool("hasDied", hasDied);
     }
 
     // Tells me whether I'm out of lives
