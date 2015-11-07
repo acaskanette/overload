@@ -18,6 +18,7 @@ public class CharacterManager : MonoBehaviour {
     private Animator animator;
 
     bool hasDied;
+    
 
     [SerializeField]
     private AudioClip shutdownSound;
@@ -45,7 +46,7 @@ public class CharacterManager : MonoBehaviour {
             {
                 livesIconArray[i] = (GameObject)GameObject.Instantiate(livesIcon, Vector3.zero, Quaternion.identity);
                 livesIconArray[i].transform.parent = UICanvas.transform;
-                livesIconArray[i].GetComponent<RectTransform>().localPosition = new Vector3(-555.0f + i * 32.0f, -335.0f);
+                livesIconArray[i].GetComponent<RectTransform>().localPosition = new Vector3(-555.0f + i * 32.0f, -140.0f);
             }
             else
                 livesIconArray[i] = null;
@@ -118,6 +119,10 @@ public class CharacterManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-	
+	    if (animator.GetCurrentAnimatorStateInfo(0).IsName("Death"))
+        {
+            hasDied = false;
+            animator.SetBool("hasDied", hasDied);
+        }
 	}
 }

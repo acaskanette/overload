@@ -48,8 +48,10 @@ public class OverloadCharacterControllor : MonoBehaviour {
 	void Update () {
 
         print("Transform forward: " + transform.forward);
+        float angle = 0.0f;
 
         CharacterController controller = GetComponent<CharacterController>();
+
         if (controller.isGrounded)
         {
 
@@ -58,8 +60,19 @@ public class OverloadCharacterControllor : MonoBehaviour {
 
             jumping = false;
             moveDirection = new Vector3(horizontal, 0, vertical);
-            moveDirection = transform.TransformDirection(moveDirection);            
+            moveDirection = transform.TransformDirection(moveDirection);
+            moveDirection.Normalize();
             moveDirection *= MAX_SPEED;
+
+            Debug.Log("movedir: " + moveDirection);
+
+            Vector3 scaledPos = transform.position;
+            scaledPos.Scale(new Vector3(1, 0, 1));
+            //   Vector3 
+            Vector3 u = scaledPos - (scaledPos + moveDirection);
+            angle = Mathf.Atan2(u.z, u.x);
+       //     float angle = Vector3.Angle(scaledPos, scaledPos + moveDirection);
+            print("angle of direction: " + (angle));
 
             if (Input.GetButton("Jump"))
             {
@@ -70,9 +83,18 @@ public class OverloadCharacterControllor : MonoBehaviour {
         }
 
         animator.SetBool("isJumping", jumping);
-        animator.SetFloat("moveSpeed", moveDirection.magnitude);
+        if (!jumping) 
+            animator.SetFloat("moveSpeed", moveDirection.magnitude);
+        else
+            animator.SetFloat("moveSpeed", 0.0f);
+
+        // Turn to face, using Quaternion Lerp
+        //print(transform.rotation.y);
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.AngleAxis(angle, Vector3.up),1.0f);
 
         moveDirection.y -= gravity * Time.deltaTime;        
+               
         controller.Move(moveDirection * Time.deltaTime);
 
 
