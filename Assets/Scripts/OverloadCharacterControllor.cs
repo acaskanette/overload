@@ -47,8 +47,8 @@ public class OverloadCharacterControllor : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        print("Transform forward: " + transform.forward);
-        float angle = 0.0f;
+        //print("Transform forward: " + transform.forward);
+        //float angle = 0.0f;
 
         CharacterController controller = GetComponent<CharacterController>();
 
@@ -56,23 +56,48 @@ public class OverloadCharacterControllor : MonoBehaviour {
         {
 
             float horizontal = Input.GetAxis("Horizontal");
+            
             float vertical = Input.GetAxis("Vertical");
+            print("H:" + horizontal + "  V:" + vertical);
 
             jumping = false;
             moveDirection = new Vector3(horizontal, 0, vertical);
-            moveDirection = transform.TransformDirection(moveDirection);
+           // moveDirection = transform.TransformDirection(moveDirection);
             moveDirection.Normalize();
             moveDirection *= MAX_SPEED;
 
-            Debug.Log("movedir: " + moveDirection);
+            Vector3 direction = Vector3.zero;
 
-            Vector3 scaledPos = transform.position;
-            scaledPos.Scale(new Vector3(1, 0, 1));
-            //   Vector3 
-            Vector3 u = scaledPos - (scaledPos + moveDirection);
-            angle = Mathf.Atan2(u.z, u.x);
-       //     float angle = Vector3.Angle(scaledPos, scaledPos + moveDirection);
-            print("angle of direction: " + (angle));
+            if (horizontal > 0.2f)
+            {
+                print("right");
+                direction = Vector3.right;
+                //facingAngle = 0.0f;
+            }
+            else if (horizontal < -0.2f)
+            {
+                print("left");
+                direction = Vector3.left;
+                //facingAngle = 180;
+            }
+            if (vertical > 0.2f)
+            {
+                print("up");
+                direction = Vector3.forward;
+                //facingAngle = 90;
+            }
+            else if (vertical < -0.2f)
+            {
+                print("down");
+                direction = Vector3.back;
+                //facingAngle = -90;
+            }
+            print("Direction: " + direction);
+            if (direction!= Vector3.zero)
+                gameObject.transform.LookAt(gameObject.transform.position + direction);
+                // Debug.Log("movedir: " + moveDirection);
+
+               // print("angle of direction: " + (angle));
 
             if (Input.GetButton("Jump"))
             {
@@ -81,6 +106,8 @@ public class OverloadCharacterControllor : MonoBehaviour {
             }
 
         }
+
+        
 
         animator.SetBool("isJumping", jumping);
         if (!jumping) 
@@ -91,7 +118,7 @@ public class OverloadCharacterControllor : MonoBehaviour {
         // Turn to face, using Quaternion Lerp
         //print(transform.rotation.y);
 
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.AngleAxis(angle, Vector3.up),1.0f);
+        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.AngleAxis(angle, Vector3.up),1.0f);
 
         moveDirection.y -= gravity * Time.deltaTime;        
                

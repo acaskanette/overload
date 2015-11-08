@@ -123,7 +123,7 @@ public class FloorScript : MonoBehaviour {
             int x = rand.Next(startPoint+1, -startPoint);
             int z = rand.Next(startPoint+1, -startPoint);
             if ( !( x == 0 && z == 0) )     // Unless it's the center tile
-                obstacles[i] = (GameObject)(GameObject.Instantiate(obstacleTile, new Vector3(x * sizeOfTile, 1.5f, z * sizeOfTile), Quaternion.identity));                
+                obstacles[i] = (GameObject)(GameObject.Instantiate(obstacleTile, new Vector3(x * sizeOfTile, 1.0f, z * sizeOfTile), Quaternion.identity));                
         }
     }
 

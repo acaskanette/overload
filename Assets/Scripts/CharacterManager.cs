@@ -71,6 +71,7 @@ public class CharacterManager : MonoBehaviour {
                 // If not, Respawn in the center, send the enemies back into their spawners
                 hasDied = true;
                 animator.SetBool("hasDied", hasDied);
+                _other.gameObject.GetComponentInChildren<Animator>().SetBool("killedPlayer", true);
                 StartCoroutine(OnDeath());
                 
             }
