@@ -38,6 +38,15 @@ public class EnemyScript : MonoBehaviour {
 	}
 
 
+    void OnCollisionEnter(Collision other)
+    {
+        if (other.collider.tag == "Tile")
+        {
+            print("Enemy Hit a tile");
+            rigidBody.AddForce(Vector3.up * 0.10f, ForceMode.Impulse);
+        }
+    }
+
     /// <summary>
     /// Find the player and then Chase the player
     /// </summary>
@@ -46,6 +55,8 @@ public class EnemyScript : MonoBehaviour {
  
        transform.LookAt(player.transform);
        rigidBody.AddForce(transform.forward * Speed, ForceMode.Acceleration);
+        if (transform.position.y > 4.0f)
+            transform.position -= Vector3.down * Time.deltaTime*2;
         
     }
 

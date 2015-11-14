@@ -35,12 +35,16 @@ public class OverloadCharacterControllor : MonoBehaviour {
     
     bool jumping;                              // Am I jumping right now?
 
+    private StateManager stateManager;
+
+
 	// Use this for initialization
 	void Start () {
 
         targetPosition = Vector3.zero;
         moveDirection = Vector3.zero;        
-        jumping = false;                        
+        jumping = false;
+        stateManager = GameObject.FindGameObjectWithTag("Manager").GetComponent<StateManager>();                 
 	
 	}
 	
@@ -50,82 +54,92 @@ public class OverloadCharacterControllor : MonoBehaviour {
         //print("Transform forward: " + transform.forward);
         //float angle = 0.0f;
 
-        CharacterController controller = GetComponent<CharacterController>();
-
-        if (controller.isGrounded)
+        if (stateManager.currentState == StateManager.GameState.PLAYING_STATE)
         {
 
-            float horizontal = Input.GetAxis("Horizontal");
-            
-            float vertical = Input.GetAxis("Vertical");
-            print("H:" + horizontal + "  V:" + vertical);
+            CharacterController controller = GetComponent<CharacterController>();
 
-            jumping = false;
-            moveDirection = new Vector3(horizontal, 0, vertical);
-           // moveDirection = transform.TransformDirection(moveDirection);
-            moveDirection.Normalize();
-            moveDirection *= MAX_SPEED;
+            if (controller.isGrounded && !animator.GetBool("hasDied"))
+            {
 
-            Vector3 direction = Vector3.zero;
+                float horizontal = Input.GetAxis("Horizontal");
 
-            if (horizontal > 0.2f)
-            {
-                print("right");
-                direction = Vector3.right;
-                //facingAngle = 0.0f;
-            }
-            else if (horizontal < -0.2f)
-            {
-                print("left");
-                direction = Vector3.left;
-                //facingAngle = 180;
-            }
-            if (vertical > 0.2f)
-            {
-                print("up");
-                direction = Vector3.forward;
-                //facingAngle = 90;
-            }
-            else if (vertical < -0.2f)
-            {
-                print("down");
-                direction = Vector3.back;
-                //facingAngle = -90;
-            }
-            print("Direction: " + direction);
-            if (direction!= Vector3.zero)
-                gameObject.transform.LookAt(gameObject.transform.position + direction);
+                float vertical = Input.GetAxis("Vertical");
+                //  print("H:" + horizontal + "  V:" + vertical);
+
+                jumping = false;
+                moveDirection = new Vector3(horizontal, 0, vertical);
+                // moveDirection = transform.TransformDirection(moveDirection);
+                moveDirection.Normalize();
+                moveDirection *= MAX_SPEED;
+
+                Vector3 direction = Vector3.zero;
+
+                if (horizontal > 0.2f)
+                {
+                    //  print("right");
+                    direction = Vector3.right;
+                    //facingAngle = 0.0f;
+                }
+                else if (horizontal < -0.2f)
+                {
+                    // print("left");
+                    direction = Vector3.left;
+                    //facingAngle = 180;
+                }
+                if (vertical > 0.2f)
+                {
+                    // print("up");
+                    direction = Vector3.forward;
+                    //facingAngle = 90;
+                }
+                else if (vertical < -0.2f)
+                {
+                    // print("down");
+                    direction = Vector3.back;
+                    //facingAngle = -90;
+                }
+                //print("Direction: " + direction);
+                if (direction != Vector3.zero)
+                    gameObject.transform.LookAt(gameObject.transform.position + direction);
                 // Debug.Log("movedir: " + moveDirection);
 
-               // print("angle of direction: " + (angle));
+                // print("angle of direction: " + (angle));
 
-            if (Input.GetButton("Jump"))
-            {
-                moveDirection.y = jumpSpeed;
-                jumping = true;
+                if (Input.GetButton("Jump"))
+                {
+                    moveDirection.y = jumpSpeed;
+                    jumping = true;
+                }
+
             }
 
+
+
+            animator.SetBool("isJumping", jumping);
+            if (!jumping)
+                animator.SetFloat("moveSpeed", moveDirection.magnitude);
+            else
+                animator.SetFloat("moveSpeed", 0.0f);
+
+
+
+            // Turn to face, using Quaternion Lerp
+            //print(transform.rotation.y);
+
+            //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.AngleAxis(angle, Vector3.up),1.0f);
+
+            moveDirection.y -= gravity * Time.deltaTime;
+
+            if (animator.GetBool("hasDied"))
+            {
+                moveDirection = Vector3.zero;
+            }
+
+            controller.Move(moveDirection * Time.deltaTime);
+
+
         }
-
-        
-
-        animator.SetBool("isJumping", jumping);
-        if (!jumping) 
-            animator.SetFloat("moveSpeed", moveDirection.magnitude);
-        else
-            animator.SetFloat("moveSpeed", 0.0f);
-
-        // Turn to face, using Quaternion Lerp
-        //print(transform.rotation.y);
-
-        //transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.AngleAxis(angle, Vector3.up),1.0f);
-
-        moveDirection.y -= gravity * Time.deltaTime;        
-               
-        controller.Move(moveDirection * Time.deltaTime);
-
-
-        
 
 
 	}    

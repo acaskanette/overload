@@ -18,6 +18,8 @@ public class EnemySpawnScript : MonoBehaviour {
 
     float timeBetweenSpawns = 2.0f;                 // Default seconds between enemies spawn
 
+    StateManager stateManager;
+
     // Setter for spawnColour;
     public void SetSpawnColour (Color _spawnColour) {
         spawnColour = _spawnColour;
@@ -31,6 +33,8 @@ public class EnemySpawnScript : MonoBehaviour {
 
     // Use this for initialization
 	void Start () {
+
+        stateManager = GameObject.FindGameObjectWithTag("Manager").GetComponent<StateManager>();
 
         spawnedEnemies = new GameObject[MAX_ENEMIES_AT_ONE_TIME];
 
@@ -155,18 +159,20 @@ public class EnemySpawnScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        
-        timeBetweenSpawns += Time.deltaTime;
 
-        if (timeBetweenSpawns > TIME_BETWEEN_SPAWNS)
+        if (stateManager.currentState == StateManager.GameState.PLAYING_STATE)
         {
-           // print("CalledSpawnFromUpdate");
-            Spawn();
-            timeBetweenSpawns = 0.0f;
-        }
-        
-        // Every 3s
-        // Spawn();
+
+            timeBetweenSpawns += Time.deltaTime;
+
+            if (timeBetweenSpawns > TIME_BETWEEN_SPAWNS)
+            {
+                // print("CalledSpawnFromUpdate");
+                Spawn();
+                timeBetweenSpawns = 0.0f;
+            }
+
+        }        
 
 	}
 }

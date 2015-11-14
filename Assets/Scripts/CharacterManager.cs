@@ -16,41 +16,22 @@ public class CharacterManager : MonoBehaviour {
 
     [SerializeField]
     private Animator animator;
-
-    bool hasDied;
-    
-
+   
     [SerializeField]
     private AudioClip shutdownSound;
     [SerializeField]
-    private GameObject livesIcon;
+    private Text livesText;
 
     [SerializeField]
     private GameObject UICanvas;
-
-    private GameObject[] livesIconArray;
-
+    
 
 
 	// Use this for initialization
 	void Start () {
         currentLives = STARTING_LIVES;              // Initialize number of lives
         stateManager = GameObject.FindGameObjectWithTag("Manager").GetComponent<StateManager>();
-        hasDied = false;
-        
-        // Set up UI for lives
-        livesIconArray = new GameObject[MAX_NUMBER_OF_LIVES];
-        for (int i = 0; i < MAX_NUMBER_OF_LIVES; i++)
-        {
-            if (i < STARTING_LIVES)
-            {
-                livesIconArray[i] = (GameObject)GameObject.Instantiate(livesIcon, Vector3.zero, Quaternion.identity);
-                livesIconArray[i].transform.parent = UICanvas.transform;
-                livesIconArray[i].GetComponent<RectTransform>().localPosition = new Vector3(-555.0f + i * 32.0f, -140.0f);
-            }
-            else
-                livesIconArray[i] = null;
-        }
+        animator.SetBool("hasDied", false);      
             
 	}
 
@@ -59,18 +40,18 @@ public class CharacterManager : MonoBehaviour {
     // Something hit the player, so let's process that
     void OnTriggerEnter(Collider _other)
     {
-        if (_other.tag == "Enemy" && !hasDied)      // Oh no! An enemy hit me!
+        if (_other.tag == "Enemy" && !animator.GetBool("hasDied"))      // Oh no! An enemy hit me!
         {
             LoseLife();            
             // Check if permanently dead
             if (OutOfLives())
             {
                 stateManager.SetState(StateManager.GameState.GAMEOVER_STATE);   // If I am, Game Over man!
+                Respawn();
             } 
             else {
-                // If not, Respawn in the center, send the enemies back into their spawners
-                hasDied = true;
-                animator.SetBool("hasDied", hasDied);
+                // If not, Respawn in the center, send the enemies back into their spawners                
+                animator.SetBool("hasDied", true);
                 _other.gameObject.GetComponentInChildren<Animator>().SetBool("killedPlayer", true);
                 StartCoroutine(OnDeath());
                 
@@ -83,19 +64,23 @@ public class CharacterManager : MonoBehaviour {
         yield return new WaitForSeconds(3.0f);
        
         Respawn();
-        stateManager.SetState(StateManager.GameState.RESET_STATE);   // If I am, Game Over man!
+        stateManager.SetState(StateManager.GameState.RESET_STATE);
         
     }
 
 
+    public void ResetLives()
+    {
+        currentLives = STARTING_LIVES;
+        livesText.text = currentLives.ToString();
+    }
 
     void LoseLife() {
 
-        if (currentLives > 0 && livesIconArray[currentLives - 1] != null)
-        {
-            GameObject.Destroy(livesIconArray[currentLives-1]);
-            livesIconArray[currentLives - 1] = null;
+        if (currentLives > 0)
+        {            
             currentLives--;
+            livesText.text = currentLives.ToString();
             AudioSource.PlayClipAtPoint(shutdownSound, transform.position);
         }            
     
@@ -104,9 +89,8 @@ public class CharacterManager : MonoBehaviour {
     // Respawn the player in the center of the level
     void Respawn()
     {
-        gameObject.transform.position = new Vector3(0.0f, 1.5f, 0.0f);
-        hasDied = false;
-        animator.SetBool("hasDied", hasDied);
+        gameObject.transform.position = new Vector3(0.0f, 1.28f, 0.0f);        
+        animator.SetBool("hasDied", false);        
     }
 
     // Tells me whether I'm out of lives
@@ -120,10 +104,6 @@ public class CharacterManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-	    if (animator.GetCurrentAnimatorStateInfo(0).IsName("Death"))
-        {
-            hasDied = false;
-            animator.SetBool("hasDied", hasDied);
-        }
+	   
 	}
 }

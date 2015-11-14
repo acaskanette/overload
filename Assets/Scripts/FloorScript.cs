@@ -22,7 +22,7 @@ public class FloorScript : MonoBehaviour {
 
     private System.Random rand;
 
-    private Color[] colours = { Color.green, Color.yellow, Color.cyan, Color.magenta };       
+    public Color[] colours = { Color.green, Color.yellow, Color.cyan, Color.magenta };       
                                                 // Colours my tiles may randomize to
    
     private GameObject[,] floor;                // 2D array of floortiles
@@ -82,15 +82,15 @@ public class FloorScript : MonoBehaviour {
         rand = new System.Random();
         spawnerManager = GameObject.FindWithTag("Manager").GetComponent<SpawnerManager>();
 
-        BuildFloor();                           // Builds the main floor of the level and the obstacles (2nd floor)
-        BuildWalls();                           // Builds walls around the level   
        
-        
+
 
     }
 
     void Start()
     {
+        BuildFloor();                           // Builds the main floor of the level and the obstacles (2nd floor)
+        BuildWalls();                           // Builds walls around the level   
         BuildSpawners();                        // Build spawners in the level
     }
 
@@ -118,13 +118,19 @@ public class FloorScript : MonoBehaviour {
             }
         }
 
-        for (int i = 0; i < 4; i++)
+        // Make a pyramid
+        int x = rand.Next(1, 7);
+        int y = rand.Next(1, 7);
+
+        for (int i = x - 1; i < x + 2; i++)
         {
-            int x = rand.Next(startPoint+1, -startPoint);
-            int z = rand.Next(startPoint+1, -startPoint);
-            if ( !( x == 0 && z == 0) )     // Unless it's the center tile
-                obstacles[i] = (GameObject)(GameObject.Instantiate(obstacleTile, new Vector3(x * sizeOfTile, 1.0f, z * sizeOfTile), Quaternion.identity));                
+            for (int j = y - 1; j < y + 2; j++)
+            {
+                floor[i, j].transform.position += Vector3.up;
+            }
         }
+        floor[x, y].transform.position += Vector3.up;
+
     }
 
 
@@ -207,7 +213,7 @@ public class FloorScript : MonoBehaviour {
         x = rand.Next(0, sizeOfGrid);
         y = rand.Next(0, sizeOfGrid);
                 
-        if ( floorScripts[x,y].IsActive() || (x==sizeOfGrid/2 && y==sizeOfGrid/2) || IsUnderAnObstacle(x,y))       // If it's Active or the center tile or under an obstacle
+        if ( floorScripts[x,y].IsActive() || (x==sizeOfGrid/2 && y==sizeOfGrid/2))       // If it's Active or the center tile or under an obstacle
             return GetInactiveTile();      // Get a new one                   
         else
             return floor[x, y];            // Otherwise, return it
@@ -216,24 +222,7 @@ public class FloorScript : MonoBehaviour {
 
 
 
-    /// <summary>
-    /// Returns true if the tile at location x, y is directly below an obstacle
-    /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
-    /// <returns></returns>
-    private bool IsUnderAnObstacle(int x, int y)
-    {
-        bool isUnder = false;
-
-        for (int i = 0 ; i < NUMBER_OF_OBSTACLES ; i++) {
-            if (floor[x, y].transform.position.x == obstacles[i].transform.position.x && floor[x, y].transform.position.z == obstacles[i].transform.position.z)
-                isUnder = true;
-        }
-        
-        return isUnder;
-    }
-
+    
 
     /// <summary>
     /// Returns if all Floor tiles are active (should almost never happen, but may if you stand still for a while)
@@ -331,13 +320,16 @@ public class FloorScript : MonoBehaviour {
 
     }
 
+
+
+
     private IEnumerator CheckRespawn(Color _colour)
     {
 
         yield return new WaitForSeconds(3.1f);
      
         // Check if there are any more enemies of this colour waiting to be spawned
-        if (spawnerManager.CheckAnyMoreToSpawn(_colour))
+        if (spawnerManager.AnyMoreToSpawn(_colour))
         // Create a new set of tiles of this colour (if true)
         {
             print("Activating Tileset after a kill");
@@ -347,16 +339,50 @@ public class FloorScript : MonoBehaviour {
     }
    
 
+    public void ResetLevel()
+    {
+        ClearFloor();
+        ClearWalls();
+        ClearSpawners();
+        Start();
+    }
 
-	/// <summary>
-	/// Update the floor
-	/// </summary>
-	void Update () {
-
-        if ( Input.GetKeyDown(KeyCode.R))
+    void ClearFloor()
+    {
+        for (int i = 0; i < sizeOfGrid; i++)
         {
-            int randomColour = rand.Next(0, colours.Length);
-            ActivateTileSet(colours[randomColour]);
+            for (int j = 0; j < sizeOfGrid; j++)
+            {
+                GameObject.Destroy(floor[i, j]);
+                floor[i, j] = null;
+            }
         }
+    }
+
+    void ClearWalls()
+    {
+        GameObject[] walls = GameObject.FindGameObjectsWithTag("Wall");
+        foreach (GameObject wall in walls)
+        {
+            GameObject.Destroy(wall);
+        }
+    }
+
+    void ClearSpawners()
+    {
+        GameObject[] spawners = GameObject.FindGameObjectsWithTag("Spawner");
+        foreach (GameObject spawner in spawners)
+        {
+            GameObject.Destroy(spawner);
+        }
+    }
+
+
+    /// <summary>
+    /// Update the floor
+    /// </summary>
+    void Update () {
+
+        
     }
 }

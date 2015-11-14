@@ -69,7 +69,11 @@ public class ScoreManager : MonoBehaviour {
 
     }
 
-
+    public void ResetScore()
+    {
+        currentScore = 0;
+        UpdateScoreUI();
+    }
 	
 	// Update is called once per frame
 	void Update () {
