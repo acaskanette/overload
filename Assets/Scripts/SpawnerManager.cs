@@ -15,17 +15,17 @@ public class SpawnerManager : MonoBehaviour {
     private int sizeOfGrid;
 
    // private GameObject player;
-    private FloorScript playerFloorScript;
+    private FloorManager floorManager;
 
     private StateManager stateManager;
 
 	// Use this for initialization
 	void Awake () {
 
-        playerFloorScript = GameObject.FindWithTag("Manager").GetComponent<FloorScript>();
+        floorManager = GameObject.FindWithTag("Manager").GetComponent<FloorManager>();
 
         // Get the size of the spawner array
-        maxNumberColours = playerFloorScript.GetColoursLength();
+        maxNumberColours = floorManager.GetColoursLength();
 
         // Initialize the spawners
         spawnerList = new GameObject[maxNumberColours];
@@ -98,7 +98,7 @@ public class SpawnerManager : MonoBehaviour {
     {
         print("Checking all spawns empty");
         bool allEmpty = true;
-        FloorScript floor = GameObject.FindGameObjectWithTag("Manager").GetComponent<FloorScript>();
+        FloorManager floor = GameObject.FindGameObjectWithTag("Manager").GetComponent<FloorManager>();
         foreach (Color color in floor.colours)
         {
             allEmpty = allEmpty && !AnyMoreToSpawn(color);

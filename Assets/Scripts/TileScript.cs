@@ -13,7 +13,7 @@ public class TileScript : MonoBehaviour {
     public Texture touchedTexture;  // What block changes to when touch
     public Texture defaultTexture;  // No texture applied after block deactivated
 
-    GameObject managerObject;       // Where my manager at?
+    GameObject managerObject;       // Where my manager at?    
     [SerializeField]
     private GameObject activateParticle;       // Particle System to spawn when activated
     [SerializeField]
@@ -22,6 +22,9 @@ public class TileScript : MonoBehaviour {
 
     float tileGlow;
     float currentPitch;
+
+
+
 
     // Getter for IsActive
     public bool IsActive()
@@ -94,7 +97,7 @@ public class TileScript : MonoBehaviour {
                         
             isTouched = true;            
             GetComponent<Renderer>().material.SetTexture("_MKGlowTex", touchedTexture);
-            managerObject.GetComponent<FloorScript>().CheckDoneAndDeactivate(colour);
+            gameObject.transform.parent.GetComponent<FloorScript>().CheckDoneAndDeactivate(colour);
 
             // Set Pitch
             GetComponent<AudioSource>().pitch = currentPitch;

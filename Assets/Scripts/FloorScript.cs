@@ -5,36 +5,31 @@ using System;
 
 public class FloorScript : MonoBehaviour {
 
-    [SerializeField]
-    private GameObject floortile;                // What's spawned as my floor
-    [SerializeField]
-    private GameObject wallTile;                 // What's spawned as my walls
-    [SerializeField]
-    private GameObject obstacleTile;              // What obstacles are made of
-    [SerializeField]
-    private int sizeOfGrid = 9;                  // size of the square grid, should be odd
-    [SerializeField]
-    private int sizeOfTile = 1;                  // physical game world size of the tile
 
-    [SerializeField]
-    private const int TILES_PER_SET = 3;         // How many tiles are in a set when they are lit up
-    private const int NUMBER_OF_OBSTACLES = 4;
-
+    [SerializeField]    private GameObject floortile;                // What's spawned as my floor
+    [SerializeField]    private GameObject wallTile;                 // What's spawned as my walls    
+    [SerializeField]    private int sizeOfGrid;                     // size of the square grid, should be odd
+    [SerializeField]    private int sizeOfTile;                     // physical game world size of the tile
+    [SerializeField]    private int TILES_PER_SET;                  // How many tiles are in a set when they are lit up
+    [SerializeField]    private GameObject deactivateParticleEffect;// Particle effect spawned when tile deactivates
+        
     private System.Random rand;
 
-    public Color[] colours = { Color.green, Color.yellow, Color.cyan, Color.magenta };       
-                                                // Colours my tiles may randomize to
    
-    private GameObject[,] floor;                // 2D array of floortiles
-    private GameObject[] obstacles;             // Array of obstacles (2nd floor)
+    private GameObject[,] floor;                // 2D array of floortile game objects    
     private TileScript[,] floorScripts;         // 2D array of the matching floortile's TileScripts
 
     private SpawnerManager spawnerManager;      // Spawner Manager reference
 
-    [SerializeField]
-    private GameObject deactivateParticleEffect;
-
-
+    public FloorScript(Vector2 centerPoint,GameObject _floortile, GameObject _wallTile, int _sizeOfGrid, int _sizeOfTile, int _TILES_PER_SET, GameObject _deactivateParticle)
+    {
+        floortile = _floortile;
+        wallTile = _wallTile;
+        sizeOfGrid = _sizeOfGrid;
+        sizeOfTile = _sizeOfTile;
+        TILES_PER_SET = _TILES_PER_SET;
+        deactivateParticleEffect = _deactivateParticle;
+    }
 
     // Give the GameObject of the tile at those indices
     public GameObject GetTileByIndex(int _i, int _j) {
@@ -69,32 +64,21 @@ public class FloorScript : MonoBehaviour {
         return sizeOfGrid;
     }
     
-    // How many colours I have in my array 
-    public int GetColoursLength()
-    {
-        return colours.Length;
-    }
-
-
-
     /// <summary>
     /// Startup: Instantiate all variables
     /// </summary>
     void Awake () {
 
         rand = new System.Random();
+        print("Ran");
         spawnerManager = GameObject.FindWithTag("Manager").GetComponent<SpawnerManager>();
-
-       
-
-
+        BuildFloor();                           // Builds the main floor of the level and the obstacles (2nd floor)
+      
     }
 
     void Start()
-    {
-        BuildFloor();                           // Builds the main floor of the level and the obstacles (2nd floor)
-        BuildWalls();                           // Builds walls around the level   
-        BuildSpawners();                        // Build spawners in the level
+    {        
+        BuildWalls();                           // Builds walls around the level           
     }
 
 
@@ -104,8 +88,7 @@ public class FloorScript : MonoBehaviour {
     void BuildFloor()
     {
         // Instantiate floor struct
-        floor = new GameObject[sizeOfGrid, sizeOfGrid];
-        obstacles = new GameObject[NUMBER_OF_OBSTACLES];
+        floor = new GameObject[sizeOfGrid, sizeOfGrid];        
         floorScripts = new TileScript[sizeOfGrid, sizeOfGrid];
 
         int startPoint = -(sizeOfGrid / 2); // upper left bound of the grid
@@ -115,13 +98,15 @@ public class FloorScript : MonoBehaviour {
             for (int j = 0; j < sizeOfGrid; j++)
             {
 
-                floor[i,j] = (GameObject)(GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile, 0, (startPoint + j) * sizeOfTile), Quaternion.identity));                
+                floor[i, j] = (GameObject)(GameObject.Instantiate(floortile, new Vector3((startPoint + i) * sizeOfTile + transform.position.x, 0, (startPoint + j) * sizeOfTile + transform.position.z), Quaternion.identity));                
+                floor[i,j].transform.parent = this.gameObject.transform;
+                
                 floorScripts[i,j] = floor[i,j].GetComponent<TileScript>();
 
             }
         }
 
-        // Make a pyramid
+        // Make a pyramid somewhere
         int x = rand.Next(1, 7);
         int y = rand.Next(1, 7);
 
@@ -148,13 +133,13 @@ public class FloorScript : MonoBehaviour {
         // Make walls
         for (int i = 0; i < sizeOfGrid + 2; i++)
         {
-            GameObject.Instantiate(wallTile, new Vector3((startPoint + i) * sizeOfTile, 2.0f, sizeOfGrid + 1), Quaternion.identity);    // top wall
-            GameObject.Instantiate(wallTile, new Vector3((startPoint + i) * sizeOfTile, 2.0f, -(sizeOfGrid + 1)), Quaternion.identity); // bottom wall
+            GameObject.Instantiate(wallTile, new Vector3((startPoint + i) * sizeOfTile + transform.position.x, 2.0f, sizeOfGrid + 1 + transform.position.z), Quaternion.identity);    // top wall
+            GameObject.Instantiate(wallTile, new Vector3((startPoint + i) * sizeOfTile + transform.position.x, 2.0f, -(sizeOfGrid + 1) + transform.position.z), Quaternion.identity); // bottom wall
             
             if (i != 0 || i != (sizeOfGrid + 1))
             {
-                GameObject.Instantiate(wallTile, new Vector3(-(sizeOfGrid + 1), 2.0f, (startPoint + i) * sizeOfTile), Quaternion.identity); // side wall
-                GameObject.Instantiate(wallTile, new Vector3((sizeOfGrid + 1), 2.0f, (startPoint + i) * sizeOfTile), Quaternion.identity);  // other side wall
+                GameObject.Instantiate(wallTile, new Vector3(-(sizeOfGrid + 1) + transform.position.x, 2.0f, (startPoint + i) * sizeOfTile + transform.position.z), Quaternion.identity); // side wall
+                GameObject.Instantiate(wallTile, new Vector3((sizeOfGrid + 1) + transform.position.x, 2.0f, (startPoint + i) * sizeOfTile + transform.position.z), Quaternion.identity);  // other side wall
             }
 
         }
@@ -164,16 +149,14 @@ public class FloorScript : MonoBehaviour {
     /// <summary>
     /// Builds the Spawners
     /// </summary>
-    void BuildSpawners()
-    {        
-        spawnerManager.CreateSpawner(floor[0,0].transform, colours[0], 0);  // Make Red Spawner
-        ActivateTileSet(colours[0]);                                        // Activate red block set
-        spawnerManager.CreateSpawner(floor[0,8].transform, colours[1], 1);  // Make Yellow Spawner
-        ActivateTileSet(colours[1]);                                        // Activate yellow block set
-        spawnerManager.CreateSpawner(floor[8,0].transform, colours[2], 2);  // Cyan Spawner
-        ActivateTileSet(colours[2]);                                        // Activate cyan block set
-        spawnerManager.CreateSpawner(floor[8,8].transform, colours[3], 3);  // Magenta Spawner
-        ActivateTileSet(colours[3]);                                        // Activate magenta block set
+    public void BuildSpawner(int _x, int _y, Color _colour, int _spawnIndex)
+    {
+        
+        if (spawnerManager == null)
+            spawnerManager = GameObject.FindWithTag("Manager").GetComponent<SpawnerManager>();
+        spawnerManager.CreateSpawner(floor[_x, _y].transform, _colour, _spawnIndex);  // Make Red Spawner
+        ActivateTileSet(_colour);                                        // Activate red block set
+                                               // Activate magenta block set
     }
 
 
@@ -223,10 +206,7 @@ public class FloorScript : MonoBehaviour {
 
     }
 
-
-
     
-
     /// <summary>
     /// Returns if all Floor tiles are active (should almost never happen, but may if you stand still for a while)
     /// </summary>
