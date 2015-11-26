@@ -18,6 +18,9 @@ public class EnemySpawnScript : MonoBehaviour {
 
     float timeBetweenSpawns = 2.0f;                 // Default seconds between enemies spawn
 
+    [SerializeField]
+    GameObject enemySnipedEffect;
+
     StateManager stateManager;
 
     // Setter for spawnColour;
@@ -105,13 +108,30 @@ public class EnemySpawnScript : MonoBehaviour {
         AudioSource firework = GetComponent<AudioSource>();
         
         firework.Play();
+        for (int i = 0; i < spawnedEnemies.Length; i++)
+        {
+            if (spawnedEnemies[i] != null)
+                spawnedEnemies[i].GetComponent<EnemyScript>().DeathGlow();
+        }
 
-        yield return new WaitForSeconds(0.7f);
+            yield return new WaitForSeconds(0.7f);
 
         //print("Miniwait");
         firework.mute = true;
 
-        yield return new WaitForSeconds(2.4f);
+        yield return new WaitForSeconds(1.7f);
+
+        for (int i = 0; i < spawnedEnemies.Length; i++)
+        {
+            if (spawnedEnemies[i] != null)
+            {
+                GameObject.Instantiate(enemySnipedEffect, spawnedEnemies[i].gameObject.transform.position + Vector3.up * 6.0f, Quaternion.identity);
+            }
+
+        }
+
+
+        yield return new WaitForSeconds(0.7f);
 
         firework.mute = false;
 

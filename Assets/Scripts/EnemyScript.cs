@@ -12,12 +12,14 @@ public class EnemyScript : MonoBehaviour {
     private GameObject player;  // Reference to the player in the scene
     private Rigidbody rigidBody;
 
+    bool deathGlow;
         
     // Use this for initialization
 	void Start () {
 
         player = (GameObject)(GameObject.FindWithTag("Player"));
         rigidBody = GetComponent<Rigidbody>();
+        deathGlow = false;
       	
 	}
 
@@ -34,6 +36,11 @@ public class EnemyScript : MonoBehaviour {
 	void Update () {
 
        Chase();
+        if (deathGlow)
+        {
+            colour.r = 0.75f + 0.25f*Mathf.Sin(Time.deltaTime);
+            GetComponent<Renderer>().material.SetColor("_MKGlowColor", colour);
+        }
 
 	}
 
@@ -60,6 +67,12 @@ public class EnemyScript : MonoBehaviour {
         
     }
 
+    public void DeathGlow()
+    {
+        deathGlow = true;
+        colour.g = 0.0f;
+        colour.b = 0.0f;
+    }
 
     public void Kill()
     {

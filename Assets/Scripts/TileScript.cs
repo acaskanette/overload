@@ -15,7 +15,10 @@ public class TileScript : MonoBehaviour {
 
     GameObject managerObject;       // Where my manager at?
     [SerializeField]
-    private GameObject activateParticle;       // Particle System to spawn when activated   
+    private GameObject activateParticle;       // Particle System to spawn when activated
+    [SerializeField]
+    private GameObject activeParticle;
+    private GameObject activeParticleInstance;
 
     float tileGlow;
     float currentPitch;
@@ -57,12 +60,16 @@ public class TileScript : MonoBehaviour {
         isActive = true;        
         colour = _colour;        
         GetComponent<Renderer>().material.SetColor("_MKGlowColor", colour);
+        print("ActivateTile");
+        activeParticleInstance = (GameObject)GameObject.Instantiate(activeParticle, transform.position, Quaternion.identity);
+        activeParticleInstance.GetComponentInChildren<ParticleSystem>().startColor = colour;
         GameObject activateParticleInstance = (GameObject)GameObject.Instantiate(activateParticle, transform.position, Quaternion.identity);
-        activateParticleInstance.GetComponent<SpawnTileEmitterScript>().SetColour(colour);
-       
+        activateParticleInstance.GetComponent<ParticleSystem>().startColor = colour;
+
+
     }
 
-   
+
     // Deactivates a Tile
     public void DeactivateTile()
     {
@@ -73,6 +80,8 @@ public class TileScript : MonoBehaviour {
         GetComponent<Renderer>().material.SetFloat("_MKGlowPower", tileGlow);
         GetComponent<Renderer>().material.SetColor("_MKGlowColor", colour);
         GetComponent<Renderer>().material.SetTexture("_MKGlowTex", defaultTexture);
+        GameObject.Destroy(activeParticleInstance);
+        activeParticleInstance = null;
     }
 
     // Touches a tile
