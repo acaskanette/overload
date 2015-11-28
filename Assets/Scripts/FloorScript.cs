@@ -20,15 +20,11 @@ public class FloorScript : MonoBehaviour {
     private TileScript[,] floorScripts;         // 2D array of the matching floortile's TileScripts
 
     private SpawnerManager spawnerManager;      // Spawner Manager reference
-
-    public FloorScript(Vector2 centerPoint,GameObject _floortile, GameObject _wallTile, int _sizeOfGrid, int _sizeOfTile, int _TILES_PER_SET, GameObject _deactivateParticle)
+    private int spawner;
+    
+    public void SetSpawner(int _spawner)
     {
-        floortile = _floortile;
-        wallTile = _wallTile;
-        sizeOfGrid = _sizeOfGrid;
-        sizeOfTile = _sizeOfTile;
-        TILES_PER_SET = _TILES_PER_SET;
-        deactivateParticleEffect = _deactivateParticle;
+        spawner = _spawner;
     }
 
     // Give the GameObject of the tile at those indices
@@ -107,8 +103,17 @@ public class FloorScript : MonoBehaviour {
         }
 
         // Make a pyramid somewhere
-        int x = rand.Next(1, 7);
-        int y = rand.Next(1, 7);
+        int x = rand.Next(2, sizeOfGrid-2);
+        int y = rand.Next(2, sizeOfGrid-2);
+
+
+        for (int i = x - 2; i < x + 3; i++)
+        {
+            for (int j = y - 2; j < y + 3; j++)
+            {
+                floor[i, j].transform.position += Vector3.up;
+            }
+        }
 
         for (int i = x - 1; i < x + 2; i++)
         {
@@ -117,6 +122,7 @@ public class FloorScript : MonoBehaviour {
                 floor[i, j].transform.position += Vector3.up;
             }
         }
+
         floor[x, y].transform.position += Vector3.up;
 
     }
@@ -154,7 +160,7 @@ public class FloorScript : MonoBehaviour {
         
         if (spawnerManager == null)
             spawnerManager = GameObject.FindWithTag("Manager").GetComponent<SpawnerManager>();
-        spawnerManager.CreateSpawner(floor[_x, _y].transform, _colour, _spawnIndex);  // Make Red Spawner
+        spawnerManager.CreateSpawner(floor[_x, _y].transform, _colour, _spawnIndex, spawner);  // Make Red Spawner
         ActivateTileSet(_colour);                                        // Activate red block set
                                                // Activate magenta block set
     }
@@ -291,7 +297,7 @@ public class FloorScript : MonoBehaviour {
         {
 
             // Kills all the enemies of that colour
-            spawnerManager.KillSpawnsOfColour(_colour);
+            spawnerManager.KillSpawnsOfColour(_colour, spawner);
 
             // Deactivate all the Tiles of this colour
             for (int t = 0; t < TILES_PER_SET; t++)
@@ -315,7 +321,7 @@ public class FloorScript : MonoBehaviour {
         yield return new WaitForSeconds(3.1f);
      
         // Check if there are any more enemies of this colour waiting to be spawned
-        if (spawnerManager.AnyMoreToSpawn(_colour))
+        if (spawnerManager.AnyMoreToSpawn(_colour, spawner))
         // Create a new set of tiles of this colour (if true)
         {
             print("Activating Tileset after a kill");

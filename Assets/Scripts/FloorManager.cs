@@ -35,10 +35,12 @@ public class FloorManager : MonoBehaviour
         print("build floor A and B");
         floorA = (GameObject)GameObject.Instantiate(floorObject, new Vector3(-12.0f, 0.0f, 0.0f),Quaternion.identity);
         floorA.name = "Floor A";
+        floorA.GetComponent<FloorScript>().SetSpawner(1);
 
         floorB = (GameObject)GameObject.Instantiate(floorObject, new Vector3(12.0f, 0.0f, 0.0f), Quaternion.identity);
         floorB.name = "Floor B";
-        
+        floorB.GetComponent<FloorScript>().SetSpawner(2);
+
     }
 
     public int GetColoursLength()
@@ -56,16 +58,16 @@ public class FloorManager : MonoBehaviour
         FloorScript AScript = floorA.GetComponent<FloorScript>();
 
         AScript.BuildSpawner(0, 0, colours[0], 0);
-        AScript.BuildSpawner(0, 8, colours[1], 1);
-        AScript.BuildSpawner(8, 0, colours[2], 2);
-        AScript.BuildSpawner(8, 8, colours[3], 3);
+        AScript.BuildSpawner(0, 10, colours[1], 1);
+        AScript.BuildSpawner(10, 0, colours[2], 2);
+        AScript.BuildSpawner(10, 10, colours[3], 3);
 
         FloorScript BScript = floorB.GetComponent<FloorScript>();
 
-        BScript.BuildSpawner(0, 0, colours[0], 0);
-        BScript.BuildSpawner(0, 8, colours[1], 1);
-        BScript.BuildSpawner(8, 0, colours[2], 2);
-        BScript.BuildSpawner(8, 8, colours[3], 3);
+        BScript.BuildSpawner(0, 0,  colours[0], 0);
+        BScript.BuildSpawner(0, 10, colours[1], 1);
+        BScript.BuildSpawner(10, 0, colours[2], 2);
+        BScript.BuildSpawner(10, 10, colours[3], 3);
 
         //spawnerManager.CreateSpawner(floorA[0, 0].transform, colours[0], 0);  // Make Red Spawner
         //ActivateTileSet(colours[0]);                                        // Activate red block set

@@ -5,33 +5,37 @@ using UnityEngine.UI;
 public class CharacterManager : MonoBehaviour {
 
 
-  [SerializeField]
-  private const int MAX_NUMBER_OF_LIVES = 5;      // Maximum capacity for lives
-  [SerializeField]
-  private const int STARTING_LIVES = 3;           // How many lives you start the game with
+    [SerializeField]
+    private const int MAX_NUMBER_OF_LIVES = 5;      // Maximum capacity for lives
+    [SerializeField]
+    private const int STARTING_LIVES = 3;           // How many lives you start the game with
 
-  private int currentLives;                       // How many lives you have right now
+    private int currentLives;                       // How many lives you have right now
 
-  private StateManager stateManager;
+    private StateManager stateManager;
+    private Transform startPosition;
 
-  [SerializeField]
-  private Animator animator;
+    [SerializeField]
+    private Animator animator;
 
-  [SerializeField]
-  private AudioClip shutdownSound;
-  [SerializeField]
-  private Text livesText;
+    [SerializeField]
+    private AudioClip shutdownSound;
+    [SerializeField]
+    private Text livesText;
 
-  [SerializeField]
-  private GameObject UICanvas;
+    [SerializeField]
+    private GameObject UICanvas;
 
 
 
   // Use this for initialization
   void Start() {
+
     currentLives = STARTING_LIVES;              // Initialize number of lives
     stateManager = GameObject.FindGameObjectWithTag("Manager").GetComponent<StateManager>();
     animator.SetBool("hasDied", false);
+    startPosition = gameObject.transform;
+    print(startPosition.position);
 
   }
 
@@ -51,7 +55,6 @@ public class CharacterManager : MonoBehaviour {
         animator.SetBool("hasDied", true);
         _other.gameObject.GetComponentInChildren<Animator>().SetBool("killedPlayer", true);
         StartCoroutine(OnDeath());
-
       }
     }
   }
@@ -79,7 +82,8 @@ public class CharacterManager : MonoBehaviour {
 
   // Respawn the player in the center of the level
   void Respawn() {
-    gameObject.transform.position = new Vector3(0.0f, 1.28f, 0.0f);
+        print(startPosition.position);
+    gameObject.transform.position = startPosition.position;
     animator.SetBool("hasDied", false);
   }
 
