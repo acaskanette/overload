@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class EnemyScript : MonoBehaviour {
+public class EnemyScript : NetworkBehaviour
+{
 
     [SerializeField]
     private GameObject deathEffect;         // Particle system on death
@@ -9,7 +11,8 @@ public class EnemyScript : MonoBehaviour {
     public float Speed = 0.5f;         // How fast the enemy moves to chase the player
     Color colour;               // Type of enemy, what colour it glows
             
-    private GameObject player;  // Reference to the player in the scene
+    private GameObject player;              // Reference to the player in the scene
+    private string spawnerThatSpawnedMe;    // "A" or "B"
     private Rigidbody rigidBody;
 
     bool deathGlow;
@@ -17,7 +20,9 @@ public class EnemyScript : MonoBehaviour {
     // Use this for initialization
 	void Start () {
 
-        player = (GameObject)(GameObject.FindWithTag("Player"));
+        spawnerThatSpawnedMe = (gameObject.transform.position.x < 0.0) ? "A" : "B";
+        print(spawnerThatSpawnedMe + gameObject.transform.position);
+        player = (GameObject)(GameObject.FindWithTag("Player" + spawnerThatSpawnedMe));
         rigidBody = GetComponent<Rigidbody>();
         deathGlow = false;
       	

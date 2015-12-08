@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.Networking;
 
 
-public class FloorManager : MonoBehaviour
+public class FloorManager : NetworkBehaviour
 {
 
 

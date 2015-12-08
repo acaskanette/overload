@@ -1,20 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
-public class StateManager : MonoBehaviour {
+public class StateManager : NetworkBehaviour
+{
   public enum GameState { START_SCREEN, PLAYING_STATE, PAUSED_STATE, GAMEOVER_STATE, VICTORY_STATE, RESET_STATE, NUMBER_OF_STATES };
 
   public GameState currentState;
 
   SpawnerManager spawnerManager;
-  CharacterManager characterManager;
-  ScoreManager scoreManager;
+    CharacterManager characterManagerA;
+    CharacterManager characterManagerB;
+    ScoreManager scoreManager;
   FloorScript floorManager;
 
-  GameObject player;
+    GameObject playerA;
+    GameObject playerB;
 
-  [SerializeField]
+    [SerializeField]
   Canvas hud;
   [SerializeField]
   Canvas title;
@@ -33,8 +37,11 @@ public class StateManager : MonoBehaviour {
     spawnerManager = gameObject.GetComponent<SpawnerManager>();
     scoreManager = gameObject.GetComponent<ScoreManager>();
     floorManager = gameObject.GetComponent<FloorScript>();
-    player = GameObject.FindGameObjectWithTag("Player");
-    characterManager = GameObject.FindGameObjectWithTag("Player").GetComponent<CharacterManager>();
+    playerA = GameObject.FindGameObjectWithTag("PlayerA");
+    characterManagerA = playerA.GetComponent<CharacterManager>();
+
+    playerB = GameObject.FindGameObjectWithTag("PlayerB");
+    characterManagerB = playerB.GetComponent<CharacterManager>();
     hud.enabled = false;
   }
 
@@ -64,7 +71,8 @@ public class StateManager : MonoBehaviour {
         print("Game Over man!");
         break;
       case GameState.VICTORY_STATE:
-        player.GetComponentInChildren<Animator>().SetBool("victory", true);
+        playerA.GetComponentInChildren<Animator>().SetBool("victory", true);
+        playerB.GetComponentInChildren<Animator>().SetBool("victory", true);
         gameOverText.enabled = true;
         gameOverText.color = Color.green;
         print("Victory!");
@@ -89,7 +97,8 @@ public class StateManager : MonoBehaviour {
       spawnerManager.ResetSpawners();
       scoreManager.ResetScore();
       floorManager.ResetLevel();
-      characterManager.ResetLives();
+      characterManagerA.ResetLives();
+      characterManagerB.ResetLives();
       gameOverText.enabled = false;
       SetState(GameState.START_SCREEN);
     }

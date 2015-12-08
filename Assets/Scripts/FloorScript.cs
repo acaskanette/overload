@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.Networking;
 
-
-public class FloorScript : MonoBehaviour {
+public class FloorScript : NetworkBehaviour
+{
 
 
     [SerializeField]    private GameObject floortile;                // What's spawned as my floor

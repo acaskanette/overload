@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
 
-public class ScoreManager : MonoBehaviour {
+public class ScoreManager : NetworkBehaviour
+{
 
     private Color lastColourSteppedOn;      // Last Colour of tile the player stepped on
     private int steppedOnInARow;            // How many tiles of the same colour I have stepped on in a row

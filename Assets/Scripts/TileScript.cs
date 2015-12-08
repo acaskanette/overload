@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
 
-public class TileScript : MonoBehaviour {
+public class TileScript : NetworkBehaviour {
        
 
     private bool isActive;      // When the block is lit up
@@ -90,7 +91,7 @@ public class TileScript : MonoBehaviour {
     // Touches a tile
     void OnTriggerEnter(Collider _other)     // OnTouched
     {        
-        if (isActive && !isTouched && _other.tag == "Player") {  // If this tile's active and it hasn't been touched yet and the player entered
+        if (isActive && !isTouched && _other.tag.Contains("Player")) {  // If this tile's active and it hasn't been touched yet and the player entered
             Debug.Log("Mgr: " + managerObject);            
             // Add Score
             managerObject.GetComponent<ScoreManager>().SteppedOn(colour);

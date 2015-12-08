@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class SpawnerManager : MonoBehaviour {
+public class SpawnerManager : NetworkBehaviour
+{
 
 
     [SerializeField]

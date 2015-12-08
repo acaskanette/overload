@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class EnemySpawnScript : MonoBehaviour {
+public class EnemySpawnScript : NetworkBehaviour
+{
 
 	
     public const float TIME_BETWEEN_SPAWNS = 5.0f;  // in seconds

@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
 
 
-public class OverloadCharacterControllor : MonoBehaviour {
+public class OverloadCharacterControllor : NetworkBehaviour
+{
   // Speed    
   private const float MAX_SPEED = 5f;        // How fast I can go
   [SerializeField]
