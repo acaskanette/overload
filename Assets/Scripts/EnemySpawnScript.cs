@@ -8,7 +8,7 @@ public class EnemySpawnScript : NetworkBehaviour
 	
     public const float TIME_BETWEEN_SPAWNS = 5.0f;  // in seconds
     public const int MAX_ENEMIES_AT_ONE_TIME = 2;   // how many enemies this spawner can control
-    public const int MAX_NUMBER_OF_SPAWNS = 4;      // how many I'll spawn before I stop spawning
+    public const int MAX_NUMBER_OF_SPAWNS = 99;      // how many I'll spawn before I stop spawning
 
     public GameObject enemyGameObject;              // What enemy am I spawning
 

@@ -40,6 +40,15 @@ public class OverloadCharacterControllor : NetworkBehaviour
   private StateManager stateManager;
 
 
+  void Awake()
+  {
+      GameObject[] players = GameObject.FindGameObjectsWithTag("PlayerA");
+      if (players.Length > 1)
+      {
+          players[1].tag = "PlayerB";
+      }        
+  }
+
   // Use this for initialization
   void Start() {
 
@@ -47,6 +56,8 @@ public class OverloadCharacterControllor : NetworkBehaviour
     moveDirection = Vector3.zero;
     jumping = false;
     stateManager = GameObject.FindGameObjectWithTag("Manager").GetComponent<StateManager>();
+    
+    
 
   }
 
@@ -61,8 +72,10 @@ public class OverloadCharacterControllor : NetworkBehaviour
       CharacterController controller = GetComponent<CharacterController>();
 
       if (controller.isGrounded && !animator.GetBool("hasDied")) {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
+
+        char playerLetter = tag[6];
+        float horizontal = Input.GetAxis("Horizontal" + playerLetter);
+        float vertical = Input.GetAxis("Vertical" + playerLetter);
         // print("H:" + horizontal + "  V:" + vertical);
 
         jumping = false;
@@ -84,7 +97,7 @@ public class OverloadCharacterControllor : NetworkBehaviour
         else if (horizontal < 0)
           transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.left), rotSpeed * Time.deltaTime);
 
-        if (Input.GetButton("Jump")) {
+        if (Input.GetButton("Jump"+playerLetter)) {
           moveDirection.y = jumpSpeed;
           jumping = true;
         }

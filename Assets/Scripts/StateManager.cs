@@ -32,6 +32,7 @@ public class StateManager : NetworkBehaviour
 
   // Use this for initialization
   void Start() {
+    
     currentState = GameState.START_SCREEN;
     print("Now Playing...");
     spawnerManager = gameObject.GetComponent<SpawnerManager>();
@@ -43,6 +44,7 @@ public class StateManager : NetworkBehaviour
     playerB = GameObject.FindGameObjectWithTag("PlayerB");
     characterManagerB = playerB.GetComponent<CharacterManager>();
     hud.enabled = false;
+  
   }
 
   public void SetState(GameState _newState) {
@@ -74,6 +76,7 @@ public class StateManager : NetworkBehaviour
         playerA.GetComponentInChildren<Animator>().SetBool("victory", true);
         playerB.GetComponentInChildren<Animator>().SetBool("victory", true);
         gameOverText.enabled = true;
+        //gameOverText.text = "Victory!";
         gameOverText.color = Color.green;
         print("Victory!");
         break;

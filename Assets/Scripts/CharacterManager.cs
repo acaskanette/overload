@@ -70,13 +70,13 @@ public class CharacterManager : NetworkBehaviour
 
   public void ResetLives() {
     currentLives = STARTING_LIVES;
-    livesText.text = currentLives.ToString();
+    //livesText.text = currentLives.ToString();
   }
 
   void LoseLife() {
     if (currentLives > 0) {
       currentLives--;
-      livesText.text = currentLives.ToString();
+    //  livesText.text = currentLives.ToString();
       AudioSource.PlayClipAtPoint(shutdownSound, transform.position);
     }
 

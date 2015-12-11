@@ -24,6 +24,10 @@ public class ScoreManager : NetworkBehaviour
     private const float TIME_TO_REDUCE_KILLSTREAK = 1.5f;
     private float timeToReduceKillStreak = 0.0f;
 
+    private const float WIN_SCORE = 1000;
+
+    private StateManager stateManager;
+
     [SerializeField]
     private Text scoreText;
     [SerializeField]
@@ -39,6 +43,7 @@ public class ScoreManager : NetworkBehaviour
         killedInARow = 0;
         lastColourSteppedOn = Color.black;
         UpdateScoreUI();
+        stateManager = GameObject.FindWithTag("Manager").GetComponent<StateManager>();
 	}
 
 
@@ -89,10 +94,21 @@ public class ScoreManager : NetworkBehaviour
                 killedInARow = 0;
             UpdateMultiplierUI();
             timeToReduceKillStreak = 0.0f;
+
+            DetermineVictory();
+
         }
         
         
 	}
+
+    void DetermineVictory()
+    {
+        if (currentScore >= WIN_SCORE)
+        {
+            stateManager.SetState(StateManager.GameState.VICTORY_STATE);
+        }
+    }
 
     void UpdateScoreUI()
     {
