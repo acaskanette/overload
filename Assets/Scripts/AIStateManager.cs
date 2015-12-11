@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AIStateManager : MonoBehaviour {
+/*public class AIStateManager : MonoBehaviour {
 
 
     AIState currentState;
@@ -18,3 +18,4 @@ public class AIStateManager : MonoBehaviour {
 	
 	}
 }
+*/

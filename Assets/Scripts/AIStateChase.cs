@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AIStateChase : AIState
+/*public class AIStateChase : AIState
 
 {
 
@@ -152,3 +152,4 @@ public class AIStateChase : AIState
     }
 
 }
+*/
